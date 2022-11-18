@@ -26,6 +26,7 @@ void index(str myTitle, str myId, void() block, list[Extension] exts = [], list[
           switch (a) {
             case css(str c): link(\rel("stylesheet"), href(c));
             case js(str j): script(\type("text/javascript"), src(j));
+            case inlineScript(str s, str t): script(\type(t), s);
             default: throw "Unknown asset: <a>";
           }
         }

@@ -56,7 +56,7 @@ alias Encoding = tuple[int id, map[int, value] from, map[value, int] to, map[int
 //private RenderState state = ();
 
 @doc{This represents the administration of closure and event messages. It is only persistent
-during one render cycles; as per switchTo and switchFrom.}
+during one render cycle; as per switchTo and switchFrom.}
 Encoding state = <0, (), (), ()>; 
 
 @doc{To support multiplexing of multiple apps using the same web server.

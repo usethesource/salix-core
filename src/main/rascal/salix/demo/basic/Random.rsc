@@ -82,6 +82,7 @@ TwiceModel twiceUpdate(Msg msg, TwiceModel m) {
 void twiceView(TwiceModel m) {
   h2("Two times roll a die");
   mapView(sub1, m.model1, view);
+  
   mapView(sub2, m.model2, view);
 }
 

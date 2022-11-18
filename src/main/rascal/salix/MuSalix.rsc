@@ -54,7 +54,7 @@ private int record(Parser msg) {
 
 Attr event(str typ, Parser msg) {
   int key = record(msg);
-  return attr("on<typ>", "$do(<key>)");
+  return attr("on<typ>", "$do(<key>, event);");
 }
 
 Msg handle(int key, Info info) {

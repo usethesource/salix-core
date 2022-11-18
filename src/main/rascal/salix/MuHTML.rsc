@@ -10,6 +10,7 @@
 module salix::MuHTML
 
 import salix::MuSalix;
+import lang::html::AST;
 
 import List;
 import String; 
@@ -17,7 +18,7 @@ import String;
 data Msg;
  
 @doc{Create a text node.}
-void text(value v) = add(text(v));
+void text(value v) = addNode(lang::html::AST::text("<v>"));
 
 
 @doc{The element render functions below all call build
@@ -142,15 +143,15 @@ Attr style(map[str,str] styles) = attr("style", intercalate("; ", ["<k>: <styles
 Attr align(str val) = attr("align", val);
 Attr valign(str val) = attr("valign", val);
 
-Attr property(str name, value val) = prop(name, "<val>");
 Attr attribute(str name, str val) = attr(name, val);
+
 Attr class(str val) = attr("class", val);
 Attr classList(tuple[str, bool] classes...) = attr("class", intercalate(" ", [ k | <k, true > <- classes ]));
 Attr id(str val) = attr("id", val);
 Attr title(str val) = attr("title", val);
 Attr hidden(bool h) = h ? attr("hidden", "true") : null(); // ???
 Attr \type(str val) = attr("type", val);
-Attr \value(str val) = prop("value", val);
+Attr \value(str val) = attr("value", val);
 Attr defaultValue(str val) = attr("defaultValue", val); // should be attr value?
 Attr checked(bool checked) = checked ? attr("checked", "true") : null();
 Attr placeholder(str val) = attr("placeholder", val);
@@ -252,6 +253,7 @@ Attr cellspacing(str val) = attr("cellspacing", val);
  
 Attr onKeyPress(Msg(int) msg) = event("keypress", keyCode(msg));
 Attr onKeyDown(Msg(int) msg) = event("keydown", keyCode(msg));
+
 Attr onClick(Msg msg) = event("click", succeed(msg));
 Attr onDoubleClick(Msg msg) = event("dblclick", succeed(msg));
 Attr onMouseDown(Msg msg) = event("mousedown", succeed(msg));
@@ -276,17 +278,32 @@ Attr onChange(Msg(str) f) = event("change", targetValue(f));
 
 Attr onCheck(Msg(bool) f) = event("check", targetChecked(f));
   
+
+// void timeEvery(Msg(int) int2msg, int interval) {
+//   subscribe("timeEvery", targetInt(int2msg), str(int key) {
+//     return "setInterval(function () { 
+//            '  _do(<key>, {value: new Date().getTime() | 0}); 
+//            '}, <interval>);"; 
+//   });
+// }
+
+
 @doc{Smart constructors for constructing encoded event decoders.}
-Hnd succeed(Msg msg) = handler("succeed", encode(msg));
+Parser succeed(Msg msg) = Msg(Info _) { return msg; };
 
-Hnd targetValue(Msg(str) str2msg) = handler("targetValue", encode(str2msg));
+Parser targetValue(Msg(str) str2msg) 
+  = Msg(Info info) { return str2msg(info["value"]); };
 
-Hnd targetChecked(Msg(bool) bool2msg) = handler("targetChecked", encode(bool2msg));
+Parser targetChecked(Msg(bool) bool2msg) 
+  = Msg(Info info) { return bool2msg(info["checked"] == "true"); };
 
-Hnd keyCode(Msg(int) int2msg) = handler("keyCode", encode(int2msg)); 
+Parser keyCode(Msg(int) int2msg) 
+  = Msg(Info info) { return int2msg(toInt(info["keycode"])); };
 
-Hnd targetInt(Msg(int) int2msg) = handler("targetInt", encode(int2msg));
+Parser targetInt(Msg(int) int2msg) 
+  = Msg(Info info) { return int2msg(toInt(info["value"])); };
 
-Hnd targetReal(Msg(real) real2msg) = handler("targetReal", encode(real2msg));
+Parser targetReal(Msg(real) real2msg) 
+  = Msg(Info info) { return real2msg(toReal(info["value"])); };
 
   

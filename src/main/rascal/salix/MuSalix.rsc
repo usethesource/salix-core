@@ -1,10 +1,14 @@
 module salix::MuSalix
 
+/*
+
+Simplified architecture (much!)
+No support for commands/subscriptions (yet)
+*/
+
 import lang::html::AST;
 import Type;
-
-// TODO: use lang::html::AST 
-// reflective make in `build
+import List;
 
 data Msg;
 
@@ -16,34 +20,49 @@ alias M2M = Msg(Msg);
 
 alias State = tuple[
   list[list[HTMLElement]] stack, // render stack
-  list[M2M] mapStack, // message mapping 
+  list[M2M] mapStack, // message mapping (for nesting views)
   map[int, list[value]] events, // event + active mappers encoding
   int next // event counter for current round.
 ];
 
 State _state = <[], [], (), 0>;
 
-void pushMap(M2M f) { _state.mapStack += [f]; }
-void popMap() { _state.mapStack = _state.mapStack[0..-1]; }
-
-&T with(M2M f, &T() block) {
-  pushMap(f);
-  &T ret = block();
-  popMap();
-  return ret;
+private void reset() {
+  _state = <[], [], (), 0>;
 }
 
-void withv(Msg(Msg) f, void() block) {
+void pushMap(M2M f) { _state.mapStack += [f]; }
+
+void popMap() { _state.mapStack = _state.mapStack[0..-1]; }
+
+void with(M2M f, void() block) {
   pushMap(f);
   block();
   popMap();
 }
 
-Attr event(str typ, value msg) {
+alias Info = map[str, value];
+
+alias Parser = Msg(Info);
+
+private int record(Parser msg) {
   int key = _state.next;
   _state.events[key] = _state.mapStack + [msg];
   _state.next += 1;
+  return key;
+}
+
+Attr event(str typ, Parser msg) {
+  int key = record(msg);
   return attr("on<typ>", "$do(<key>)");
+}
+
+Msg handle(int key, Info info) {
+  list[value] fs = _state.events[key];
+  if (Parser p := fs[-1]) {
+    return ( p(info) | m2m(it) | int i <- [size(fs) - 2..-1], M2M m2m := fs[i] );
+  }  
+  throw "last element of event stack is not a parser but <fs[-1]>";
 }
 
 private void add(HTMLElement h) = push(pop() + [h]);
@@ -71,10 +90,10 @@ void build(list[value] vals, str tagName) {
       add(h);
     }
     else if (Attr _ := vals[-1]) {
-      ;
+      ; // deal with those later
     }
     else { // else (if not Attr), render as text.
-      add(text(vals[-1]));
+      add(text("<vals[-1]>"));
     }
   }
 
@@ -83,18 +102,21 @@ void build(list[value] vals, str tagName) {
   add(make(#HTMLElement, tagName, pop(), ( a.name: "<a.val>" | Attr a <- vals )));
 }
 
-void embed(str key, HTMLElement() block) {
-  // do native stuff. 
-}
+// void embed(str key, HTMLElement() block) {
+//   // do native stuff. 
+// }
 
 HTMLElement render(&T model, void(&T) block) {
+  reset(); // start with clean slate
   push([]); 
   block(model);
   return pop()[0];
 }
 
-alias Page[&T] = tuple[void(&T) render];
+alias Page[&T] = tuple[HTMLElement(&T) render];
 
-Page[&T] index(str title, void(&T) view) {
+// Page[&T] index(str title, void(&T) view) {
 
-}
+// }
+
+

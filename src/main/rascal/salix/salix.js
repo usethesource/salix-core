@@ -116,12 +116,11 @@ function Salix(appId, host) {
 	function subscribe(subs) {
 		for (var i = 0; i < subs.length; i++) {
 			var sub = subs[i];
-			var id = sub.subscription.handle.handle.id;
+			var id = sub.handle.id;
 			if (subscriptions.hasOwnProperty(id)) {
 				continue;
 			}
-			subscriptions[id] = Subscriptions[sub.subscription.name](sub.subscription.handle.handle, 
-									sub.subscription.args);
+			subscriptions[id] = Subscriptions[sub.name](sub.handle, sub.args);
 		}
 		unsubscribeStaleSubs(subs);
 	}

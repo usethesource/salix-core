@@ -14,355 +14,117 @@ import salix::HTML;
 
 data Msg;
 
-Node svgElement(str name, list[Node] kids, map[str,str] attrs, map[str, str] props, map[str, Hnd] events)
-  = element(name, kids, attrs, props + ("namespace": "http://www.w3.org/2000/svg"), events);
-  
+void svgBuild(list[value] vals, str tagName)
+  = build([prop("namespace", "http://www.w3.org/2000/svg")] + vals, tagName); 
+
 // User functions
 
-void foreignObject(value vals...) = build(vals, _foreignObject);
+void foreignObject(value vals...) = svgBuild(vals, "foreignObject");
 
-void svg(value vals...) = build(vals, _svg);
-void animate(value vals...) = build(vals, _animate);
-void animateColor(value vals...) = build(vals, _animateColor);
-void animateMotion(value vals...) = build(vals, _animateMotion); 
-void animateTransform(value vals...) = build(vals, _animateTransform);
-void mpath(value vals...) = build(vals, _mpath);
-void \set(value vals...) = build(vals, _set);
+void svg(value vals...) = svgBuild(vals, "svg");
+void animate(value vals...) = svgBuild(vals, "animate");
+void animateColor(value vals...) = svgBuild(vals, "animateColor");
+void animateMotion(value vals...) = svgBuild(vals, "animateMotion"); 
+void animateTransform(value vals...) = svgBuild(vals, "animateTransform");
+void mpath(value vals...) = svgBuild(vals, "mpath");
+void \set(value vals...) = svgBuild(vals, "set");
 
 // Container elements
 
-void a(value vals...) = build(vals, _a);
-void defs(value vals...) = build(vals, _defs);
-void g(value vals...) = build(vals, _g);
-void marker(value vals...) = build(vals, _marker);
-void maskEl(value vals...) = build(vals, _mask);
-void pattern(value vals...) = build(vals, _pattern);
-void \switch(value vals...) = build(vals, _switch);
-void symbol(value vals...) = build(vals, _symbol);
+void a(value vals...) = svgBuild(vals, "a");
+void defs(value vals...) = svgBuild(vals, "defs");
+void g(value vals...) = svgBuild(vals, "g");
+void marker(value vals...) = svgBuild(vals, "marker");
+void maskEl(value vals...) = svgBuild(vals, "mask");
+void pattern(value vals...) = svgBuild(vals, "pattern");
+void \switch(value vals...) = svgBuild(vals, "switch");
+void symbol(value vals...) = svgBuild(vals, "symbol");
 
 // Descriptive elements
 
-void desc(value vals...) = build(vals, _desc);
-void metadata(value vals...) = build(vals, _metadata);
-void titleEl(value vals...) = build(vals, _title);
+void desc(value vals...) = svgBuild(vals, "desc");
+void metadata(value vals...) = svgBuild(vals, "metadata");
+void titleEl(value vals...) = svgBuild(vals, "title");
 
 // Filter primitive elements
 
-void feBlend(value vals...) = build(vals, _feBlend);
-void feColorMatrix(value vals...) = build(vals, _feColorMatrix);
-void feComponentTransfer(value vals...) = build(vals, _feComponentTransfer);
-void feComposite(value vals...) = build(vals, _feComposite);
-void feConvolveMatrix(value vals...) = build(vals, _feConvolveMatrix);
-void feDiffuseLighting(value vals...) = build(vals, _feDiffuseLighting);
-void feDisplacementMap(value vals...) = build(vals, _feDisplacementMap);
-void feFlood(value vals...) = build(vals, _feFlood);
-void feFuncA(value vals...) = build(vals, _feFuncA);
-void feFuncB(value vals...) = build(vals, _feFuncB);
-void feFuncG(value vals...) = build(vals, _feFuncG);
-void feFuncR(value vals...) = build(vals, _feFuncR);
-void feGaussianBlur(value vals...) = build(vals, _feGaussianBlur);
-void feImage(value vals...) = build(vals, _feImage);
-void feMerge(value vals...) = build(vals, _feMerge);
-void feMergeNode(value vals...) = build(vals, _feMergeNode);
-void feMorphology(value vals...) = build(vals, _feMorphology);
-void feOffset(value vals...) = build(vals, _feOffset);
-void feSpecularLighting(value vals...) = build(vals, _feSpecularLighting);
-void feTile(value vals...) = build(vals, _feTile);
-void feTurbulence(value vals...) = build(vals, _feTurbulence);
+void feBlend(value vals...) = svgBuild(vals, "feBlend");
+void feColorMatrix(value vals...) = svgBuild(vals, "feColorMatrix");
+void feComponentTransfer(value vals...) = svgBuild(vals, "feComponentTransfer");
+void feComposite(value vals...) = svgBuild(vals, "feComposite");
+void feConvolveMatrix(value vals...) = svgBuild(vals, "feConvolveMatrix");
+void feDiffuseLighting(value vals...) = svgBuild(vals, "feDiffuseLighting");
+void feDisplacementMap(value vals...) = svgBuild(vals, "feDisplacementMap");
+void feFlood(value vals...) = svgBuild(vals, "feFlood");
+void feFuncA(value vals...) = svgBuild(vals, "feFuncA");
+void feFuncB(value vals...) = svgBuild(vals, "feFuncB");
+void feFuncG(value vals...) = svgBuild(vals, "feFuncG");
+void feFuncR(value vals...) = svgBuild(vals, "feFuncR");
+void feGaussianBlur(value vals...) = svgBuild(vals, "feGaussianBlur");
+void feImage(value vals...) = svgBuild(vals, "feImage");
+void feMerge(value vals...) = svgBuild(vals, "feMerge");
+void feMergeNode(value vals...) = svgBuild(vals, "feMergeNode");
+void feMorphology(value vals...) = svgBuild(vals, "feMorphology");
+void feOffset(value vals...) = svgBuild(vals, "feOffset");
+void feSpecularLighting(value vals...) = svgBuild(vals, "feSpecularLighting");
+void feTile(value vals...) = svgBuild(vals, "feTile");
+void feTurbulence(value vals...) = svgBuild(vals, "feTurbulence");
 
 
 // Font elements
 
-void font(value vals...) = build(vals, _font);
+void font(value vals...) = svgBuild(vals, "font");
 
 
 // Gradient elements
 
-void linearGradient(value vals...) = build(vals, _linearGradient);
-void radialGradient(value vals...) = build(vals, _radialGradient);
-void stop(value vals...) = build(vals, _stop);
+void linearGradient(value vals...) = svgBuild(vals, "linearGradient");
+void radialGradient(value vals...) = svgBuild(vals, "radialGradient");
+void stop(value vals...) = svgBuild(vals, "stop");
 
 
 // Graphics elements
 
-void circle(value vals...) = build(vals, _circle);
-void ellipse(value vals...) = build(vals, _ellipse);
-void image(value vals...) = build(vals, _image);
-void line(value vals...) = build(vals, _line);
-void pathEl(value vals...) = build(vals, _path);
-void polygon(value vals...) = build(vals, _polygon);
+void circle(value vals...) = svgBuild(vals, "circle");
+void ellipse(value vals...) = svgBuild(vals, "ellipse");
+void image(value vals...) = svgBuild(vals, "image");
+void line(value vals...) = svgBuild(vals, "line");
+void pathEl(value vals...) = svgBuild(vals, "path");
+void polygon(value vals...) = svgBuild(vals, "polygon");
 
-void polyline(value vals...) = build(vals, _polyline);
-void rect(value vals...) = build(vals, _rect);
-void use(value vals...) = build(vals, _use);
+void polyline(value vals...) = svgBuild(vals, "polyline");
+void rect(value vals...) = svgBuild(vals, "rect");
+void use(value vals...) = svgBuild(vals, "use");
 
 
 // Light source elements
 
-void feDistantLight(value vals...) = build(vals, _feDistantLight);
-void fePointLight(value vals...) = build(vals, _fePointLight);
-void feSpotLight(value vals...) = build(vals, _feSpotLight);
+void feDistantLight(value vals...) = svgBuild(vals, "feDistantLight");
+void fePointLight(value vals...) = svgBuild(vals, "fePointLight");
+void feSpotLight(value vals...) = svgBuild(vals, "feSpotLight");
 
 // Text content elements
 
-void altGlyph(value vals...) = build(vals, _altGlyph);
-void altGlyphDef(value vals...) = build(vals, _altGlyphDef);
-void altGlyphItem(value vals...) = build(vals, _altGlyphItem);
-void glyph(value vals...) = build(vals, _glyph);
-void glyphRefEl(value vals...) = build(vals, _glyphRef);
-void textPath(value vals...) = build(vals, _textPath);
-void text_(value vals...) = build(vals, _text_);
-void tref(value vals...) = build(vals, _tref);
-void tspan(value vals...) = build(vals, _tspan);
+void altGlyph(value vals...) = svgBuild(vals, "altGlyph");
+void altGlyphDef(value vals...) = svgBuild(vals, "altGlyphDef");
+void altGlyphItem(value vals...) = svgBuild(vals, "altGlyphItem");
+void glyph(value vals...) = svgBuild(vals, "glyph");
+void glyphRefEl(value vals...) = svgBuild(vals, "glyphRef");
+void textPath(value vals...) = svgBuild(vals, "textPath");
+void text_(value vals...) = svgBuild(vals, "text");
+void tref(value vals...) = svgBuild(vals, "tref");
+void tspan(value vals...) = svgBuild(vals, "tspan");
 
 // Uncategorized elements
 
-void clipPathEl(value vals...) = build(vals, _clipPath);
-void colorProfileEl(value vals...) = build(vals, _colorProfile);
-void cursorEl(value vals...) = build(vals, _cursor);
-void \filterEl(value vals...) = build(vals, _filter);
-void script(value vals...) = build(vals, _script);
-//void style(value vals...) = build(vals, _style);
-void view(value vals...) = build(vals, _view);
+void clipPathEl(value vals...) = svgBuild(vals, "clipPath");
+void colorProfileEl(value vals...) = svgBuild(vals, "colorProfile");
+void cursorEl(value vals...) = svgBuild(vals, "cursor");
+void \filterEl(value vals...) = svgBuild(vals, "filter");
+void script(value vals...) = svgBuild(vals, "script");
+//void style(value vals...) = svgBuild(vals, "style");
+void view(value vals...) = svgBuild(vals, "view");
   
-// basics  
-
-
-Node _foreignObject(list[Node] kids, list[Attr] attrs)
-  = svgElement("foreignObject", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _svg(list[Node] kids, list[Attr] attrs)
-  = svgElement("svg", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _animate(list[Node] kids, list[Attr] attrs)
-  = svgElement("animate", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _animateColor(list[Node] kids, list[Attr] attrs)
-  = svgElement("animateColor", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _animateMotion(list[Node] kids, list[Attr] attrs)
-  = svgElement("animateMotion", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _animateTransform(list[Node] kids, list[Attr] attrs)
-  = svgElement("animateTransform", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _mpath(list[Node] kids, list[Attr] attrs)
-  = svgElement("mpath", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _set(list[Node] kids, list[Attr] attrs)
-  = svgElement("set", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-// Container elements
-
-Node _a(list[Node] kids, list[Attr] attrs)
-  = svgElement("a", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _defs(list[Node] kids, list[Attr] attrs)
-  = svgElement("defs", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _g(list[Node] kids, list[Attr] attrs)
-  = svgElement("g", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _marker(list[Node] kids, list[Attr] attrs)
-  = svgElement("marker", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _mask(list[Node] kids, list[Attr] attrs)
-  = svgElement("mask", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _pattern(list[Node] kids, list[Attr] attrs)
-  = svgElement("pattern", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _switch(list[Node] kids, list[Attr] attrs)
-  = svgElement("switch", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _symbol(list[Node] kids, list[Attr] attrs)
-  = svgElement("symbol", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-// Descriptive elements
-
-Node _desc(list[Node] kids, list[Attr] attrs)
-  = svgElement("desc", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _metadata(list[Node] kids, list[Attr] attrs)
-  = svgElement("metadata", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _title(list[Node] kids, list[Attr] attrs)
-  = svgElement("title", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-// Filter primitive elements
-
-Node _feBlend(list[Node] kids, list[Attr] attrs)
-  = svgElement("feBlend", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feColorMatrix(list[Node] kids, list[Attr] attrs)
-  = svgElement("feColorMatrix", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feComponentTransfer(list[Node] kids, list[Attr] attrs)
-  = svgElement("feComponentTransfer", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feComposite(list[Node] kids, list[Attr] attrs)
-  = svgElement("feComposite", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feConvolveMatrix(list[Node] kids, list[Attr] attrs)
-  = svgElement("feConvolveMatrix", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-
-Node _feDiffuseLighting(list[Node] kids, list[Attr] attrs)
-  = svgElement("feDiffuseLighting", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feDisplacementMap(list[Node] kids, list[Attr] attrs)
-  = svgElement("feDisplacementMap", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feFlood(list[Node] kids, list[Attr] attrs)
-  = svgElement("feFlood", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feFuncA(list[Node] kids, list[Attr] attrs)
-  = svgElement("feFuncA", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feFuncB(list[Node] kids, list[Attr] attrs)
-  = svgElement("feFuncB", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feFuncG(list[Node] kids, list[Attr] attrs)
-  = svgElement("feFuncG", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feFuncR(list[Node] kids, list[Attr] attrs)
-  = svgElement("feFuncR", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feGaussianBlur(list[Node] kids, list[Attr] attrs)
-  = svgElement("feGaussianBlur", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feImage(list[Node] kids, list[Attr] attrs)
-  = svgElement("feImage", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feMerge(list[Node] kids, list[Attr] attrs)
-  = svgElement("feMerge", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feMergeNode(list[Node] kids, list[Attr] attrs)
-  = svgElement("feMergeNode", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feMorphology(list[Node] kids, list[Attr] attrs)
-  = svgElement("feMorphology", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feOffset(list[Node] kids, list[Attr] attrs)
-  = svgElement("feOffset", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feSpecularLighting(list[Node] kids, list[Attr] attrs)
-  = svgElement("feSpecularLighting", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feTile(list[Node] kids, list[Attr] attrs)
-  = svgElement("feTile", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feTurbulence(list[Node] kids, list[Attr] attrs)
-  = svgElement("feTurbulence", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-
-// Font elements
-
-Node _font(list[Node] kids, list[Attr] attrs)
-  = svgElement("font", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-// Gradient elements
-
-Node _linearGradient(list[Node] kids, list[Attr] attrs)
-  = svgElement("linearGradient", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _radialGradient(list[Node] kids, list[Attr] attrs)
-  = svgElement("radialGradient", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _stop(list[Node] kids, list[Attr] attrs)
-  = svgElement("stop", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-// Graphics elements
-
-Node _circle(list[Node] kids, list[Attr] attrs)
-  = svgElement("circle", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _ellipse(list[Node] kids, list[Attr] attrs)
-  = svgElement("ellipse", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _image(list[Node] kids, list[Attr] attrs)
-  = svgElement("image", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _line(list[Node] kids, list[Attr] attrs)
-  = svgElement("line", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _path(list[Node] kids, list[Attr] attrs)
-  = svgElement("path", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _polygon(list[Node] kids, list[Attr] attrs)
-  = svgElement("polygon", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _polyline(list[Node] kids, list[Attr] attrs)
-  = svgElement("polyline", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _rect(list[Node] kids, list[Attr] attrs)
-  = svgElement("rect", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _use(list[Node] kids, list[Attr] attrs)
-  = svgElement("use", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-// Light source elements
-
-Node _feDistantLight(list[Node] kids, list[Attr] attrs)
-  = svgElement("feDistantLight", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _fePointLight(list[Node] kids, list[Attr] attrs)
-  = svgElement("fePointLight", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _feSpotLight(list[Node] kids, list[Attr] attrs)
-  = svgElement("feSpotLight", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-// Text content elements
-
-Node _altGlyph(list[Node] kids, list[Attr] attrs)
-  = svgElement("altGlyph", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _altGlyphDef(list[Node] kids, list[Attr] attrs)
-  = svgElement("altGlyphDef", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _altGlyphItem(list[Node] kids, list[Attr] attrs)
-  = svgElement("altGlyphItem", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _glyph(list[Node] kids, list[Attr] attrs)
-  = svgElement("glyph", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _glyphRef(list[Node] kids, list[Attr] attrs)
-  = svgElement("glyphRef", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _textPath(list[Node] kids, list[Attr] attrs)
-  = svgElement("textPath", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _text_(list[Node] kids, list[Attr] attrs)
-  = svgElement("text", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _tref(list[Node] kids, list[Attr] attrs)
-  = svgElement("tref", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _tspan(list[Node] kids, list[Attr] attrs)
-  = svgElement("tspan", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-// Uncategorized elements
-
-Node _clipPath(list[Node] kids, list[Attr] attrs)
-  = svgElement("clipPath", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _colorProfile(list[Node] kids, list[Attr] attrs)
-  = svgElement("colorProfile", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _cursor(list[Node] kids, list[Attr] attrs)
-  = svgElement("cursor", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _filter(list[Node] kids, list[Attr] attrs)
-  = svgElement("filter", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _script(list[Node] kids, list[Attr] attrs)
-  = svgElement("script", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _style(list[Node] kids, list[Attr] attrs)
-  = svgElement("style", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
-
-Node _view(list[Node] kids, list[Attr] attrs)
-  = svgElement("view", kids, attrsOf(attrs), propsOf(attrs), eventsOf(attrs));
 
 // Attributes
 

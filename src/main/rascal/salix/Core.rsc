@@ -204,7 +204,7 @@ Node render(void() block) {
 The list of argument values can contain any number of Attr values.
 The last argument (if any) can be a block, an Node node, or a value.
 In the latter case it is converted to a txt node.}
-void build(list[value] vals, Node(list[Node], list[Attr]) elt) {
+void build(list[value] vals, str tagName) {
   
   push([]); // start a new scope for this element's children
   
@@ -222,12 +222,12 @@ void build(list[value] vals, Node(list[Node], list[Attr]) elt) {
 
   // construct the `elt` using the kids at the top of the stack
   // and any attributes in vals and add it to the parent's list of children.
-  add(elt(pop(), [ a | Attr a <- vals ]));
-  
+  list[Attr] as = [ a | Attr a <- vals ];
+  add(hnode(element(), tagName=tagName, kids=pop(), attrs=attrsOf(as), props=propsOf(as), events=eventsOf(as)));
 }
 
 @doc{Create a text node from an arbitrary value.}
-void _text(value v) = add(txt("<v>")); // TODO: HTML encode.
+void _text(value v) = add(hnode(txt(), contents="<v>")); // TODO: HTML encode.
 
 
 /*

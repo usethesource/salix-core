@@ -184,10 +184,10 @@ function Salix(appId, host) {
 		return result;
 	}
 
-	function nodeType(node) {
-		for (var type in node) { break; }
-		return type;
-	}
+	// function nodeType(node) {
+	// 	for (var type in node) { break; }
+	// 	return type;
+	// }
 
 
 	function patchThis(dom, edits, attach) {
@@ -195,15 +195,14 @@ function Salix(appId, host) {
 
 		for (var i = 0; i < edits.length; i++) {
 			var edit = edits[i];
-			var type = nodeType(edit);
 
-			switch (type) {
+			switch (edit.type) {
 			
 			case 'replace':
-				build(edit[type].html, attach);
+				build(edit.html, attach);
 
 			case 'setText': 
-				dom.nodeValue = edit[type].contents;
+				dom.nodeValue = edit.contents;
 				break;			
 				
 			case 'removeNode': 
@@ -211,34 +210,34 @@ function Salix(appId, host) {
 				break;
 				
 			case 'appendNode':
-				build(edit[type].html, appender(dom));
+				build(edit.html, appender(dom));
 				break;
 				
 			case 'setAttr': 
-				dom.setAttribute(edit[type].name, edit[type].val);
+				dom.setAttribute(edit.name, edit.val);
 				break;
 				
 			case 'setProp': 
-				dom[edit[type].name] = edit[type].val;
+				dom[edit.name] = edit.val;
 				break;
 				
 			case 'setEvent':
-				var key = edit[type].name;
-				var h = edit[type].handler;
+				var key = edit.name;
+				var h = edit.handler;
 				var handler = getHandler(h);
 				setEventListener(dom, key, handler);
 				break
 			
 			case 'removeAttr': 
-				dom.removeAttribute(edit[type].name);
+				dom.removeAttribute(edit.name);
 				break;
 				
 			case 'removeProp': 
-				delete dom[edit[type].name];
+				delete dom[edit.name];
 				break;
 				
 			case 'removeEvent': 
-				var key = edit[type].name;
+				var key = edit.name;
 				var handler = dom.salix_handlers[key];
 				handler.stale = true;
 				dom.removeEventListener(key, handler);
@@ -262,17 +261,17 @@ function Salix(appId, host) {
 	
 	function patchDOM(dom, tree, attach) {
 		if (dom.salix_native) {
-			dom.salix_native.patch(tree.patch.edits, attach)
+			dom.salix_native.patch(tree.edits, attach)
 		} 
 		else {
-			patchThis(dom, tree.patch.edits, attach);
+			patchThis(dom, tree.edits, attach);
 		}
 		
 		// NB: (native || replace in edits) implies tree.patch.patches == []
-		var patches = tree.patch.patches || [];
+		var patches = tree.patches || [];
 		for (var i = 0; i < patches.length; i++) {
 			var p = patches[i];
-			var kid = dom.childNodes[p.patch.pos];
+			var kid = dom.childNodes[p.pos];
 			patchDOM(kid, p, replacer(dom, kid));
 		}
 		
@@ -298,28 +297,26 @@ function Salix(appId, host) {
 	        return;
 	    }
 
-	    var type = nodeType(vdom);
-	    var vattrs = vdom[type].attrs || {};
-	    var vprops = vdom[type].props || {};
-	    var vevents = vdom[type].events || {};
+	    var vattrs = vdom.attrs || {};
+	    var vprops = vdom.props || {};
+	    var vevents = vdom.events || {};
 
-	    if (vdom.native) {
-	    	var native = vdom.native;
-	    	builders[native.kind](attach, native.id, vattrs, vprops, vevents, native.extra);
+	    if (vdom.type === 'native') {
+	    	builders[vdom.kind](attach, vdom.id, vattrs, vprops, vevents, vdom.extra);
 	    	return;
 	    }
 
 	    // an element
 	    
 	    var elt = vprops.namespace != undefined
-	            ? document.createElementNS(vprops.namespace, vdom.element.tagName)
-	            : document.createElement(vdom.element.tagName);
+	            ? document.createElementNS(vprops.namespace, vdom.tagName)
+	            : document.createElement(vdom.tagName);
 	    
 	    updateAttrsPropsAndEvents(elt, vattrs, vprops, vevents);       
 	    
 	    attach(elt);
-	    for (var i = 0; i < vdom.element.kids.length; i++) {
-	    	build(vdom.element.kids[i], appender(elt));
+	    for (var i = 0; i < vdom.kids.length; i++) {
+	    	build(vdom.kids[i], appender(elt));
 	    }
 	    
 	}
@@ -374,12 +371,12 @@ function Salix(appId, host) {
 	
 	
 	function getDecoder(hnd) {
-		return Decoders[hnd.handler.name](hnd.handler.args);
+		return Decoders[hnd.name](hnd.args);
 	}
 	
 	function getHandler(hnd) {
 		var handler = function (event) {
-			event.message = makeMessage(hnd.handler.handle.handle, getDecoder(hnd)(event));
+			event.message = makeMessage(hnd.handle, getDecoder(hnd)(event));
 			if (event.message) {
 				event.handler = handler; // used to detect staleness
 				handle(event);
@@ -391,7 +388,7 @@ function Salix(appId, host) {
 	function getNativeHandler(hnd) {
 		return function (arg0, arg1, arg2, arg3) {
 			var event = {}; // simulate ordinary event
-			event.message = makeMessage(hnd.handler.handle.handle, getDecoder(hnd)(arg0, arg1, arg2, arg3))
+			event.message = makeMessage(hnd.handle, getDecoder(hnd)(arg0, arg1, arg2, arg3))
 			if (event.message) {
 				handle(event);
 			}
@@ -438,7 +435,6 @@ function Salix(appId, host) {
 	return {start: start, 
 			registerNative: registerNative,
 			build: build,
-			nodeType: nodeType,
 			getNativeHandler: getNativeHandler,
 			Subscriptions: Subscriptions,
 			Decoders: Decoders,

@@ -10,17 +10,22 @@ module salix::Node
 
 import List;
 
-// TODO: make attrs/props/events kw params to save memory
-// TODO: make attrs map[str, Attribute] to deal with namespaces
+// data Node
+//   = element(str tagName, list[Node] kids, map[str, str] attrs, map[str, str] props, map[str, Hnd] events)
+//   | native(str kind, str id, map[str,str] attrs, map[str, str] props, map[str, Hnd] events, map[str,value] extra = ())
+//   | txt(str contents)
+//   | empty() 
+//   ;  
 
 @doc{The basic Html node type, defining constructors for
 elements, text nodes, and native nodes (which are managed in js).}
 data Node
-  = element(str tagName, list[Node] kids, map[str, str] attrs, map[str, str] props, map[str, Hnd] events)
-  | native(str kind, str id, map[str,str] attrs, map[str, str] props, map[str, Hnd] events, map[str,value] extra = ())
-  | txt(str contents)
-  | empty() 
-  ;  
+  = hnode(NodeType \type, str tagName="", list[Node] kids=[], map[str,str] attrs=(),
+          map[str,str] props=(), map[str,Hnd] events=(),
+          str id="", str kind="", str contents="");
+
+data NodeType
+  = element() | native() | txt() | empty();
 
 @doc{An abstract type for represent event handlers.}
 data Hnd;  
@@ -49,15 +54,15 @@ map[str,Hnd] eventsOf(list[Attr] attrs) = ( k: v | event(str k, Hnd v) <- attrs 
 
 Node bareHtml(Node n) {
   return visit(n) {
-  	case element(str t, list[Node] kids, map[str,str] as, _, _) => element(t, kids, as, (), ())
-  	case native(_, _, _, _, _, extra = _) => element("div", [], (), (), ()) 
+  	case h:hnode(element()) => hnode(element(),tagName=h.tagName, kids=h.kids, attrs=h.attrs)
+  	case hnode(native()) => hnode(element(), tagName="div")
   }
 }
 
-str toHtml(element(str n, list[Node] kids, map[str, str] attrs, _ , _)) 
-  = "\<<n> <attrs2str(attrs)>\><kids2html(kids)>\</<n>\>";
+str toHtml(h:hnode(element())) 
+  = "\<<h.tagName> <attrs2str(h.attrs)>\><kids2html(h.kids)>\</<h.tagName>\>";
 
-str toHtml(txt(str s)) = s;
+str toHtml(h:hnode(txt())) = h.contents;
   
 str kids2html(list[Node] kids)
   = ( "" | it + toHtml(k) | Node k <- kids );

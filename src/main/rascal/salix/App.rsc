@@ -12,12 +12,12 @@ module salix::App
 import salix::Node;
 import salix::Core;
 import salix::Diff;
-import salix::Patch;
 
 import util::Webserver;
 import util::Maybe;
 import IO;
 import String;
+
 
 data Msg;
 
@@ -50,7 +50,7 @@ handling messages originating from wrapped "native" elements.}
 SalixApp[&T] makeApp(str appId, &T() init, void(&T) view, &T(Msg, &T) update, 
   Subs[&T] subs = list[Sub](&T _) {return [];}, Parser parser = parseMsg, bool debug = false) {
    
-  Node currentView = empty();
+  Node currentView = hnode(empty());
   
   Maybe[&T] currentModel = nothing();
    

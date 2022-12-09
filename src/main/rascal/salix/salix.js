@@ -102,9 +102,9 @@ function Salix(appId, host) {
 			if (cmd.none) { // legacy; let's move to list[Cmd] again...
 				continue;
 			}
-			var data = Commands[cmd.command.name](cmd.command.args);
+			var data = Commands[cmd.name](cmd.args);
 
-			prepend.push({message: makeMessage(cmd.command.handle.handle, data)});
+			prepend.push({message: makeMessage(cmd.handle, data)});
 		}
 		for (var i = prepend.length - 1; i >= 0; i--) {
 			// unshift in reverse, so that first executed command
@@ -291,8 +291,8 @@ function Salix(appId, host) {
 	
 	
 	function build(vdom, attach) {
-	    if (vdom.txt) {
-	        attach(document.createTextNode(vdom.txt.contents));
+	    if (vdom.type === 'txt') {
+	        attach(document.createTextNode(vdom.contents));
 	        return;
 	    }
 

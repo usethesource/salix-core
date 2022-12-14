@@ -311,7 +311,11 @@ class Salix {
 				break;			
 				
 			case 'removeNode': 
-				dom.removeChild(dom.lastChild);
+				let subject = dom.lastChild;
+				if (this.isAlienDOM(subject)) {
+					delete this.theAliens[subject.getAttribute('id')];
+				}
+				dom.removeChild(subject);
 				break;
 				
 			case 'appendNode':

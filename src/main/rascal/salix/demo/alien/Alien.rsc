@@ -58,6 +58,8 @@ The contract for an "alien" element is as follows:
 - events handled in the alien element should rerouted to salix to create messages.
 
 The example here puts all JS inline, but this code can also be in a separate JS file.
+If multiple aliens co-exist in the same page, pass the script loading to withIndex
+to have a single script load for multiple alien elements.
 }
 void cyto(str name, rel[str, str] graph) {
   withExtra(("graph": graph), () {

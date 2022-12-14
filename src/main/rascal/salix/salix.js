@@ -9,69 +9,176 @@
  *  - Tijs van der Storm - storm@cwi.nl - CWI
  */
 
-function Salix(appId, host) {
-	
-	// 'native 'dom elements
-	var builders = {};
+class Salix {
 
-	// currently active subscriptions
-	var subscriptions = {};
-	
-	// signals whether a new rendering is requested
-	// during that time, we won't process events
-	var renderRequested = true;
-	
-	// queue of pending commands, events, subscription events
-	var queue = [];
-	
-	function makeURL(msg, data) {
-	    var base = (host || '') + '/' + appId + '/' + msg;
+	constructor (appId, host) {
+
+		// alien elements (identified by class) are not managed by salix's
+		// patch machinery, and "booted" through the ALIEN_EVENT
+		this.ALIEN_CLASS = 'salix-alien';
+		this.ALIEN_EVENT = 'click';
+
+		this.appId = appId;
+		this.host = host;
+
+		// functions which simulate "patch" for alien dom elements.
+		// indexed by id attr of the dom node (required)
+		this.theAliens = {};
+
+		// currently active subscriptions
+		this.subscriptions = {};
+		
+		// signals whether a new rendering is requested
+		// during that time, we won't process events
+		this.renderRequested = true;
+		
+		// queue of pending commands, events, subscription events
+		this.queue = [];
+
+
+		// Basic library of commands and subscriptions
+		// can be extended by 'natives'.
+		// TODO: this seems way too complex...
+		
+		this.Subscriptions = {
+			timeEvery: (h, args) => {
+				var timer = setInterval(function() {
+					var data = {type: 'integer', value: (new Date().getTime() / 1000) | 0};
+					this.handle({message: this.makeMessage(h, data)}); 
+				}, args.interval);
+				return () => clearInterval(timer);
+			}
+		};
+
+		this.Commands = {
+				random: args => {
+					var to = args.to;
+					var from = args.from;
+					var random = Math.floor(Math.random() * (to - from + 1)) + from;
+					return {type: 'integer', value: random};
+				},
+				setFocus: args => {
+					var id = args.id;
+					document.getElementById(id).focus();
+					return {};
+				}
+		};
+
+		this.Decoders = {
+			succeed: function (args) {
+				return function (e) { return {type: 'nothing'}; };
+			},
+
+			targetValue: function (args) {
+				return function (e) { return {type: 'string', value: e.target.value}; };
+			},
+
+			targetInt: function (args) {
+				return function (e) { return {type: 'integer', value: e.target.value}; };
+			},
+
+			targetReal: function (args) {
+				return function (e) { return {type: 'real', value: e.target.value}; };
+			},
+
+			
+			targetChecked: function (args) {
+				return function (e) { return {type: 'boolean', value: e.target.checked}; };
+			},
+			
+			keyCode: function (args) {
+				return function (e) {
+					return {type: 'integer', value: e.keyCode};
+				};
+			}
+		};	
+	}
+
+	makeURL(msg, data) {
+	    var base = (this.host || '') + '/' + this.appId + '/' + msg;
 	    if (data) {
 	    	base += '?' + new URLSearchParams(data).toString();
 	    }
 	    return base;
 	}
 	
-	
-	function start() {
-	    fetch(makeURL('init'))
-          .then(response => response.json())
-          .then(data => { step(data); doSome(); });
+	isAlienVDOM(vdom) {
+		const vattrs = vdom.attrs || {};
+		return vattrs['class'] === this.ALIEN_CLASS;
+	}
+
+	isAlienDOM(dom) {
+		return dom.className === this.ALIEN_CLASS;
+	}
+
+	registerAlien(id, patcher) {
+		this.theAliens[id] = patcher;
 	}
 	
-	function root() {
+	bootAlien(alien) {
+		// this function triggers "init" code
+		// hidden in some event handling attribute
+		// also to register the alien to salix.
+		const attr = 'on' + this.ALIEN_EVENT;
+		const handler = alien[attr];
+		alien[attr] = null;
+		alien.removeAttribute(attr);
+		const newHandler = e => { 
+			handler(e); // trigger init code
+			// and then prevent further 'click's
+			alien.removeEventListener(this.ALIEN_EVENT, newHandler);
+		}
+		alien.addEventListener(this.ALIEN_EVENT, newHandler);
+		const ev = new Event(this.ALIEN_EVENT);
+		ev.salix = this;
+		alien.dispatchEvent(ev);
+	}
+	
+	bootAliens() {
+		const aliens = document.getElementsByClassName(this.ALIEN_CLASS);
+		for (let i = 0; i < aliens.length; i++) {
+			this.bootAlien(aliens[i]);
+		}
+	}
+
+	start() {
+		this.bootAliens(); 
+	    fetch(this.makeURL('init'))
+          .then(response => response.json())
+          .then(data => { this.step(data); this.doSome(); });
+	}
+	
+	root() {
 		return document.body;
 	}
 
 		
 	// event is either an ordinary event or {message: ...} from sub.
-	function handle(event) {
+	handle(event) {
 		// if doSome didn't do anything, we trigger the loop again here
 		// because there's work now.
-		if (queue.length == 0) {
-			window.requestAnimationFrame(doSome);
+		if (this.queue.length == 0) {
+			window.requestAnimationFrame(() => this.doSome());
 		}
-		queue.push(event);
+		this.queue.push(event);
 	}
 	
-	function doSome() {
-		if (!renderRequested) {
-			while (queue.length > 0) {
+	doSome() {
+		if (!this.renderRequested) {
+			while (this.queue.length > 0) {
 			    document.body.style.cursor = 'progress';
-				var event = queue.shift();
-				if (isStale(event)) {
+				var event = this.queue.shift();
+				if (this.isStale(event)) {
 					console.log('Stale event');
 					continue;
 				}
-				renderRequested = true;
-				fetch(makeURL('msg', event.message))
+				this.renderRequested = true;
+				fetch(this.makeURL('msg', event.message))
 				   .then(response => response.json())
-				   .then(data => 
-				       step(data)
-				   )
-				   .catch(function (error) {
-				  	    renderRequested = false;
-					    window.requestAnimationFrame(doSome);
+				   .then(data => this.step(data))
+				   .catch(error => {
+				  	    this.renderRequested = false;
+					    window.requestAnimationFrame(() => this.doSome());
 					    document.body.style.cursor = 'auto';
 				    });
 				
@@ -80,57 +187,57 @@ function Salix(appId, host) {
 		}
 	}
 	
-	function step(payload) {
-		render(payload.patch);
-		doCommands(payload.commands);
-		subscribe(payload.subs);
+	step(payload) {
+		this.render(payload.patch);
+		this.doCommands(payload.commands);
+		this.subscribe(payload.subs);
 		// I don't understand why, but putting these in 
 		// .always on the get request doesn't work....
-		renderRequested = false;
-		window.requestAnimationFrame(doSome);
+		this.renderRequested = false;
+		window.requestAnimationFrame(() => this.doSome());
 		document.body.style.cursor = 'auto';
 	}
 	
-	function render(patch) {
-		patchDOM(root(), patch, replacer(root().parentNode, root()));	
+	render(patch) {
+		this.patchDOM(this.root(), patch, this.replacer(this.root().parentNode, this.root()));	
 	}
 	
-	function doCommands(cmds) {
+	doCommands(cmds) {
 		var prepend = [];
 		for (var i = 0; i < cmds.length; i++) {
 			var cmd = cmds[i];
 			if (cmd.none) { // legacy; let's move to list[Cmd] again...
 				continue;
 			}
-			var data = Commands[cmd.name](cmd.args);
+			var data = this.Commands[cmd.name](cmd.args);
 
-			prepend.push({message: makeMessage(cmd.handle, data)});
+			prepend.push({message: this.makeMessage(cmd.handle, data)});
 		}
 		for (var i = prepend.length - 1; i >= 0; i--) {
 			// unshift in reverse, so that first executed command
 			// is handled first.
-			queue.unshift(prepend[i]);
+			this.queue.unshift(prepend[i]);
 		}
 	}
 	
-	function subscribe(subs) {
+	subscribe(subs) {
 		for (var i = 0; i < subs.length; i++) {
 			var sub = subs[i];
 			var id = sub.handle.id;
-			if (subscriptions.hasOwnProperty(id)) {
+			if (this.subscriptions.hasOwnProperty(id)) {
 				continue;
 			}
-			subscriptions[id] = Subscriptions[sub.name](sub.handle, sub.args);
+			this.subscriptions[id] = this.Subscriptions[sub.name](sub.handle, sub.args);
 		}
-		unsubscribeStaleSubs(subs);
+		this.unsubscribeStaleSubs(subs);
 	}
 
-	function unsubscribeStaleSubs(subs) {
+	unsubscribeStaleSubs(subs) {
 		// TODO: fix this abomination
 		var toDelete = [];
 		
-		outer: for (var k in subscriptions) {
-			if (subscriptions.hasOwnProperty(k)) {
+		outer: for (var k in this.subscriptions) {
+			if (this.subscriptions.hasOwnProperty(k)) {
 				for (var i = 0; i < subs.length; i++) {
 					var sub = subs[i];
 					var id = sub.subscription.handle.handle.id;
@@ -142,32 +249,32 @@ function Salix(appId, host) {
 			}
 		}
 		for (var i = 0; i < toDelete.length; i++) {
-			subscriptions[toDelete[i]](); // shutdown
+			this.subscriptions[toDelete[i]](); // shutdown
 			delete subscriptions[toDelete[i]];
 		}
 	}
 
-	function isStale(event) {
+	isStale(event) {
 		if (!event.target) {
-			return false; // subscription, command, or 'native'
+			return false; // subscription, command
 		}
 		if (event.handler.stale) {
 			return true;
 		}
-		return isStaleDOM(event.target);
+		return this.isStaleDOM(event.target);
 	}
 	
-	function isStaleDOM(dom) {
+	isStaleDOM(dom) {
 		if (dom === null) {
 			return true;
 		}
 		if (dom === document) {
 			return false;
 		}
-		return isStaleDOM(dom.parentNode);
+		return this.isStaleDOM(dom.parentNode);
 	}
 	
-	function makeMessage(handle, data) {
+	makeMessage(handle, data) {
 		if (!data) {
 			return; // TODO: don't encode "not handling the event" by undefined data.
 		}
@@ -183,13 +290,8 @@ function Salix(appId, host) {
 		return result;
 	}
 
-	// function nodeType(node) {
-	// 	for (var type in node) { break; }
-	// 	return type;
-	// }
 
-
-	function patchThis(dom, edits, attach) {
+	patchThis(dom, edits, attach) {
 		edits = edits || [];
 
 		for (var i = 0; i < edits.length; i++) {
@@ -198,7 +300,11 @@ function Salix(appId, host) {
 			switch (edit.type) {
 			
 			case 'replace':
-				build(edit.html, attach);
+				this.build(edit.html, attach);
+				if (this.isAlienVDOM(edit.html)) {
+					this.bootAlien(edit.html);
+				}
+				break;
 
 			case 'setText': 
 				dom.nodeValue = edit.contents;
@@ -209,7 +315,10 @@ function Salix(appId, host) {
 				break;
 				
 			case 'appendNode':
-				build(edit.html, appender(dom));
+				this.build(edit.html, appender(dom));
+				if (this.isAlienVDOM(edit.html)) {
+					this.bootAlien(edit.html);
+				}
 				break;
 				
 			case 'setAttr': 
@@ -223,8 +332,8 @@ function Salix(appId, host) {
 			case 'setEvent':
 				var key = edit.name;
 				var h = edit.handler;
-				var handler = getHandler(h);
-				setEventListener(dom, key, handler);
+				var handler = this.getHandler(h);
+				this.setEventListener(dom, key, handler);
 				break
 			
 			case 'removeAttr': 
@@ -250,33 +359,32 @@ function Salix(appId, host) {
 		}
 	}
 	
-	function replacer(dom, oldKid) {
+	replacer(dom, oldKid) {
 		return function (newKid) { dom.replaceChild(newKid, oldKid); };
 	}
 	
-	function appender(dom) {
+	appender(dom) {
 		return function (kid) { dom.appendChild(kid); };
 	}
 	
-	function patchDOM(dom, tree, attach) {
-		if (dom.salix_native) {
-			dom.salix_native.patch(tree.edits, attach)
+	patchDOM(dom, tree, attach) {
+		if (this.isAlienDOM(dom)) {
+			// every alien element should have a unique id
+			// to retrieve the associated patch closure
+			this.theAliens[dom.getAttribute('id')](tree.edits, attach);
+			return;
 		} 
-		else {
-			patchThis(dom, tree.edits, attach);
-		}
+		this.patchThis(dom, tree.edits, attach);
 		
-		// NB: (native || replace in edits) implies tree.patch.patches == []
 		var patches = tree.patches || [];
 		for (var i = 0; i < patches.length; i++) {
 			var p = patches[i];
 			var kid = dom.childNodes[p.pos];
-			patchDOM(kid, p, replacer(dom, kid));
+			this.patchDOM(kid, p, this.replacer(dom, kid));
 		}
-		
 	}
 
-	function setEventListener(dom, key, handler) {
+	setEventListener(dom, key, handler) {
 		var allHandlers = dom.salix_handlers || {};
 		if (allHandlers.hasOwnProperty(key)) {
 			dom.removeEventListener(key, allHandlers[key]);
@@ -290,7 +398,7 @@ function Salix(appId, host) {
 
 	
 	
-	function build(vdom, attach) {
+	build(vdom, attach) {
 	    if (vdom.type === 'txt') {
 	        attach(document.createTextNode(vdom.contents));
 	        return;
@@ -300,27 +408,19 @@ function Salix(appId, host) {
 	    var vprops = vdom.props || {};
 	    var vevents = vdom.events || {};
 
-	    if (vdom.type === 'native') {
-	    	builders[vdom.kind](attach, vdom.id, vattrs, vprops, vevents, vdom.extra);
-	    	return;
-	    }
-
-	    // an element
-	    
 	    var elt = vprops.namespace != undefined
 	            ? document.createElementNS(vprops.namespace, vdom.tagName)
 	            : document.createElement(vdom.tagName);
 	    
-	    updateAttrsPropsAndEvents(elt, vattrs, vprops, vevents);       
+	    this.updateAttrsPropsAndEvents(elt, vattrs, vprops, vevents);       
 	    
 	    attach(elt);
 	    for (var i = 0; i < vdom.kids.length; i++) {
-	    	build(vdom.kids[i], appender(elt));
+	    	this.build(vdom.kids[i], appender(elt));
 	    }
-	    
 	}
 	
-	function updateAttrsPropsAndEvents(elt, vattrs, vprops, vevents) {
+	updateAttrsPropsAndEvents(elt, vattrs, vprops, vevents) {
 		for (var k in vattrs) {
 	        if (vattrs.hasOwnProperty(k)) {
 	            elt.setAttribute(k, vattrs[k]);
@@ -340,104 +440,35 @@ function Salix(appId, host) {
 	    }
 	}
 
-	// Basic library of commands and subscriptions
-	// can be extended by 'natives'.
-	// TODO: this seems way too complex...
-	
-	var Subscriptions = {
-			timeEvery: function (h, args) {
-				var timer = setInterval(function() {
-					var data = {type: 'integer', value: (new Date().getTime() / 1000) | 0};
-					handle({message: makeMessage(h, data)}); 
-				}, args.interval);
-				return function () { clearInterval(timer); };
-			}
-	};
-	
-	var Commands = {
-			random: function (args) {
-				var to = args.to;
-				var from = args.from;
-				var random = Math.floor(Math.random() * (to - from + 1)) + from;
-				return {type: 'integer', value: random};
-			},
-			setFocus: function (args) {
-			  var id = args.id;
-			  document.getElementById(id).focus();
-			  return {};
-			}
-	};
 	
 	
-	function getDecoder(hnd) {
-		return Decoders[hnd.name](hnd.args);
+	
+	getDecoder(hnd) {
+		return this.Decoders[hnd.name](hnd.args);
 	}
 	
-	function getHandler(hnd) {
-		var handler = function (event) {
-			event.message = makeMessage(hnd.handle, getDecoder(hnd)(event));
+	getHandler(hnd) {
+		var handler = event => {
+			event.message = this.makeMessage(hnd.handle, this.getDecoder(hnd)(event));
 			if (event.message) {
 				event.handler = handler; // used to detect staleness
-				handle(event);
+				this.handle(event);
 			}
 		}
 		return handler;
 	}
 	
-	function getNativeHandler(hnd) {
+
+	getAlienHandler(hnd) {
 		return function (arg0, arg1, arg2, arg3) {
 			var event = {}; // simulate ordinary event
-			event.message = makeMessage(hnd.handle, getDecoder(hnd)(arg0, arg1, arg2, arg3))
+			event.message = this.makeMessage(hnd.handle, this.getDecoder(hnd)(arg0, arg1, arg2, arg3))
 			if (event.message) {
-				handle(event);
+				this.handle(event);
 			}
 		};
 	}
-	
-	var Decoders = {
-			succeed: function (args) {
-				return function (e) { return {type: 'nothing'}; };
-			},
 
-			targetValue: function (args) {
-				return function (e) { return {type: 'string', value: e.target.value}; };
-			},
-
-			targetInt: function (args) {
-				return function (e) { return {type: 'integer', value: e.target.value}; };
-			},
-
-			targetReal: function (args) {
-				return function (e) { return {type: 'real', value: e.target.value}; };
-			},
-
-			
-			targetChecked: function (args) {
-				return function (e) { return {type: 'boolean', value: e.target.checked}; };
-			},
-			
-			keyCode: function (args) {
-				return function (e) {
-//					if (e.keyCode === args.keyCode) {
-//						return {type: 'nothing'};
-//					}
-					return {type: 'integer', value: e.keyCode};
-				};
-			}
-	};
-	
-	
-	function registerNative(kind, builder) {
-		builders[kind] = builder;
-	}
-	
-	return {start: start, 
-			registerNative: registerNative,
-			build: build,
-			getNativeHandler: getNativeHandler,
-			Subscriptions: Subscriptions,
-			Decoders: Decoders,
-			Commands: Commands};
 }
 
 

@@ -35,7 +35,7 @@ data Hnd = null();
 
 data Edit
   = edit(EditType \type, str contents="", Node html=none(), Hnd handler=null(),
-        str name="", str val="", value \value=-1);
+        str name="", str val="", value extra=());
 
 // nodes at this level are always assumed to be <html> nodes,
 // however, we only diff their bodies. This is (unfortunately)
@@ -59,15 +59,15 @@ Patch diff(Node old, Node new, int idx) {
     return patch(idx);
   }
   
-  if (old.\type is native, new.\type is native) {
-    edits = diffMap(old.props, new.props, setProp(), removeProp())
-      + diffMap(old.attrs, new.attrs, setAttr(), removeAttr())
-      + diffEventMap(old.events, new.events);
-    if (old.id != new.id) {
-      edits += edit(setProp(), name="id", val=new.id);
-    }
-    return patch(idx, edits = edits);  
-  }
+  // if (old.\type is native, new.\type is native) {
+  //   edits = diffMap(old.props, new.props, setProp(), removeProp())
+  //     + diffMap(old.attrs, new.attrs, setAttr(), removeAttr())
+  //     + diffEventMap(old.events, new.events);
+  //   if (old.id != new.id) {
+  //     edits += edit(setProp(), name="id", val=new.id);
+  //   }
+  //   return patch(idx, edits = edits);  
+  // }
   
   if (old.\type is element, old.tagName != new.tagName) {
     return patch(idx, edits = [edit(replace(), html=new)]);
@@ -76,7 +76,8 @@ Patch diff(Node old, Node new, int idx) {
   // same kind of elements
   edits = diffMap(old.attrs, new.attrs, setAttr(), removeAttr())
     + diffMap(old.props, new.props, setProp(), removeProp())  
-    + diffEventMap(old.events, new.events);
+    + diffEventMap(old.events, new.events)
+    + diffExtra(old.extra, new.extra);
   
   return diffKids(old.kids, new.kids, patch(idx, edits = edits));
 }
@@ -132,3 +133,17 @@ list[Edit] diffMap(map[str, str] old, map[str, str] new, EditType upd, EditType 
   return edits;
 } 
 
+list[Edit] diffExtra(map[str, value] old, map[str, value] new) {
+  edits = for (str k <- old) {
+    if (k in new) {
+      if (new[k] != old[k]) {
+        append edit(setExtra(), name=k, extra=new[k]);
+      }
+    }
+    else {
+      append edit(removeExtra(), name=k);
+    }
+  }
+  edits += [ edit(setExtra(), name=k, extra=new[k]) | k <- new, k notin old ];
+  return edits;
+} 

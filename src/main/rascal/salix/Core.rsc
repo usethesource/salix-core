@@ -199,13 +199,24 @@ Node render(void() block) {
   return pop()[0];
 }
 
+private list[map[str, value]] extra = [];
+
+void withExtra(map[str, value] stuff, void() block) {
+  extra += [stuff];
+  block();
+  extra = extra[0..-1];
+}
 
 @doc{The basic build function to construct html elements on the stack.
 The list of argument values can contain any number of Attr values.
 The last argument (if any) can be a block, an Node node, or a value.
 In the latter case it is converted to a txt node.}
 void build(list[value] vals, str tagName) {
-  
+  map[str, value] myExtra = ();
+  if (size(extra) > 0) {
+    myExtra = extra[-1];  
+  }
+
   push([]); // start a new scope for this element's children
   
   if (vals != []) { 
@@ -223,7 +234,11 @@ void build(list[value] vals, str tagName) {
   // construct the `elt` using the kids at the top of the stack
   // and any attributes in vals and add it to the parent's list of children.
   list[Attr] as = [ a | Attr a <- vals ];
-  add(hnode(element(), tagName=tagName, kids=pop(), attrs=attrsOf(as), props=propsOf(as), events=eventsOf(as)));
+  Node theNode = hnode(element(), tagName=tagName, kids=pop(), attrs=attrsOf(as), props=propsOf(as), events=eventsOf(as));
+  if (myExtra != ()) {
+    theNode.extra = myExtra;
+  }
+  add(theNode);
 }
 
 @doc{Create a text node from an arbitrary value.}

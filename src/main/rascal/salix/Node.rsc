@@ -10,22 +10,15 @@ module salix::Node
 
 import List;
 
-// data Node
-//   = element(str tagName, list[Node] kids, map[str, str] attrs, map[str, str] props, map[str, Hnd] events)
-//   | native(str kind, str id, map[str,str] attrs, map[str, str] props, map[str, Hnd] events, map[str,value] extra = ())
-//   | txt(str contents)
-//   | empty() 
-//   ;  
-
 @doc{The basic Html node type, defining constructors for
 elements, text nodes, and native nodes (which are managed in js).}
 data Node
   = hnode(NodeType \type, str tagName="", list[Node] kids=[], map[str,str] attrs=(),
-          map[str,str] props=(), map[str,Hnd] events=(),
+          map[str,str] props=(), map[str,Hnd] events=(), map[str,value] extra=(),
           str id="", str kind="", str contents="");
 
 data NodeType
-  = element() | native() | txt() | empty();
+  = element() | txt() | empty();
 
 @doc{An abstract type for represent event handlers.}
 data Hnd;  
@@ -55,7 +48,6 @@ map[str,Hnd] eventsOf(list[Attr] attrs) = ( k: v | event(str k, Hnd v) <- attrs 
 Node bareHtml(Node n) {
   return visit(n) {
   	case h:hnode(element()) => hnode(element(),tagName=h.tagName, kids=h.kids, attrs=h.attrs)
-  	case hnode(native()) => hnode(element(), tagName="div")
   }
 }
 

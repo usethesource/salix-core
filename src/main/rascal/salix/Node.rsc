@@ -35,9 +35,8 @@ data Attr
 
 @doc{Helper functions to partition list of Attrs into attrs, props and events} 
 map[str,str] attrsOf(list[Attr] attrs) = ( k: v | attr(str k, str v) <- attrs ) 
-                                       + ((attr("class", _) <- attrs) ? ( "class" : "<for (attr("class", str v) <- attrs) {><v> <}>"[..-1])
-                                                                      : ())
-                                       ;
+    + ((attr("class", _) <- attrs) ? ( "class" : "<for (attr("class", str v) <- attrs) {><v> <}>"[..-1])
+                                  : ());
 
 map[str,str] propsOf(list[Attr] attrs) = ( k: v | prop(str k, str v) <- attrs );
 

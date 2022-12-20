@@ -39,19 +39,10 @@ void index(str myTitle, str myId, void() block, list[Extension] exts = [], list[
       for (str s <- scripts + ["/salix/salix.js"]) {
         script(\type("text/javascript"), src(s));
       }
-      
-      str src = "const app = new Salix();\n";
-      
-      for (Extension e <- exts) {
-        src += "register<capitalize(e.name)>(app);\n";
-      }
-      
+                  
       script("document.addEventListener(\"DOMContentLoaded\", function() {
-             '  const app = new Salix(\"<myId>\");
-             '  <for (Extension e <- exts) {>
-             '  register<capitalize(e.name)>(app);
-             '  <}>
-             '  app.start();
+             '  window.$salix = new Salix(\"<myId>\");
+             '  $salix.start();
              '});");
     });
     

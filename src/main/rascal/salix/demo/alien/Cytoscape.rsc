@@ -6,7 +6,7 @@
 }
 @contributor{Tijs van der Storm - storm@cwi.nl - CWI}
 
-module salix::demo::alien::Alien
+module salix::demo::alien::Cytoscape
 
 import salix::App;
 import salix::HTML;
@@ -21,11 +21,11 @@ alias Model = rel[str, str];
 
 Model init() = {<"a", "b">, <"b", "c">, <"c", "a">};
 
-SalixApp[Model] alienApp(str id = "alien") 
+SalixApp[Model] cytoApp(str id = "alien") 
   = makeApp(id, init, withIndex("Alien", id, view), update);
 
-App[Model] alienWebApp()
-  = webApp(alienApp(), |project://salix/src/main/rascal|);
+App[Model] cytoWebApp()
+  = webApp(cytoApp(), |project://salix/src/main/rascal|);
 
 data Msg = changeIt();
 
@@ -42,7 +42,7 @@ Model update(Msg msg, Model m) {
 
 str initCode(str key) = 
     "var cy_<key> = cytoscape({container: document.getElementById(\'cyto_<key>\')});
-    'event.salix.registerAlien(\'<key>\', (edits) =\> cytopatch(cy_<key>, event.salix, edits)); 
+    '$salix.registerAlien(\'<key>\', edits =\> cytopatch(cy_<key>, edits)); 
     '";
 
 @doc{
@@ -51,7 +51,7 @@ The contract for an "alien" element is as follows:
 - it should have an unique id 
 - it should have an onclick event handler specified as a raw attribute, which:
      - runs any init code required for any loaded JS etc. via script tags
-     - registers itself, via `event.salix.registerAlien(<id>, edits => ...)` (see `initCode` above)
+     - registers itself, via `$salix.registerAlien(<id>, edits => ...)` (see `initCode` above)
        (where the closure receives the "patch" to be able to deal with changes)
   the event is programmatically triggered in the Salix bootstrap phase
   after all content has been loaded; after that, the handler is removed.
@@ -61,12 +61,12 @@ The example here puts all JS inline, but this code can also be in a separate JS 
 If multiple aliens of the same type co-exist in the same page, pass the script loading to withIndex
 to have a single script load for multiple alien elements.
 }
-void cyto(str name, rel[str, str] graph) {
+void cyto(str name, rel[str, str] graph, str width="200px", str height="200px") {
   withExtra(("graph": graph), () {
     div(class("salix-alien"), id(name), attr("onclick", initCode(name)), () {
         script(src("https://cdn.jsdelivr.net/npm/cytoscape@3.23.0/dist/cytoscape.umd.js"));
-        script("function cytopatch(cy, salix, edits) {
-               '  console.log(\'patching cyto \' + JSON.stringify(edits));
+        script("function cytopatch(cy, patch) {
+               '  console.log(\'patching cyto \' + JSON.stringify(patch.edits));
                '  var g = {elements: []};
                '  for (let i = 0; i \< edits[0].extra.length; i++) {
                '    let a = edits[0].extra[i][0];
@@ -80,7 +80,7 @@ void cyto(str name, rel[str, str] graph) {
                '  cy.json(g);
                '  cy.layout({name: \'random\'}).run();
                '}");
-        div(style(("width": "200px", "height": "200px")), id("cyto_" + name));
+        div(style(("width": width, "height": height)), id("cyto_" + name));
     });
   });
 }

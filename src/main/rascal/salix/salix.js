@@ -130,7 +130,6 @@ class Salix {
 		}
 		alien.addEventListener(this.ALIEN_EVENT, newHandler);
 		const ev = new Event(this.ALIEN_EVENT);
-		ev.salix = this;
 		alien.dispatchEvent(ev);
 	}
 	
@@ -153,16 +152,6 @@ class Salix {
 	}
 
 		
-	// event is either an ordinary event or {message: ...} from sub.
-	handle(event) {
-		// if doSome didn't do anything, we trigger the loop again here
-		// because there's work now.
-		if (this.queue.length == 0) {
-			window.requestAnimationFrame(() => this.doSome());
-		}
-		this.queue.push(event);
-	}
-	
 	doSome() {
 		if (!this.renderRequested) {
 			while (this.queue.length > 0) {
@@ -273,6 +262,36 @@ class Salix {
 		}
 		return this.isStaleDOM(dom.parentNode);
 	}
+
+	/*
+	 * Event handling
+	 */
+
+	// used by aliens
+	send(hnd, event) { 
+		this.handle({message: this.makeMessage(hnd.handle, this.getDecoder(hnd)(event))});
+	}
+	
+	// event is either an ordinary event or {message: ...} from sub/send.
+	handle(event) {
+		// if doSome didn't do anything, we trigger the loop again here
+		// because there's work now.
+		if (this.queue.length == 0) {
+			window.requestAnimationFrame(() => this.doSome());
+		}
+		this.queue.push(event);
+	}
+	
+	getHandler(hnd) {
+		var handler = event => {
+			event.message = this.makeMessage(hnd.handle, this.getDecoder(hnd)(event));
+			if (event.message) {
+				event.handler = handler; // used to detect staleness
+				this.handle(event);
+			}
+		}
+		return handler;
+	}
 	
 	makeMessage(handle, data) {
 		if (!data) {
@@ -290,6 +309,38 @@ class Salix {
 		return result;
 	}
 
+	setEventListener(dom, key, handler) {
+		var allHandlers = dom.salix_handlers || {};
+		if (allHandlers.hasOwnProperty(key)) {
+			dom.removeEventListener(key, allHandlers[key]);
+			allHandlers[key].stale = true;
+		}
+		allHandlers[key] = handler;
+		dom.addEventListener(key, handler);
+		dom.salix_handlers = allHandlers;
+		return handler;
+	}
+
+	getDecoder(hnd) {
+		return this.Decoders[hnd.name](hnd.args);
+	}
+	
+
+
+	getHandler(hnd) {
+		var handler = event => {
+			event.message = this.makeMessage(hnd.handle, this.getDecoder(hnd)(event));
+			if (event.message) {
+				event.handler = handler; // used to detect staleness
+				this.handle(event);
+			}
+		}
+		return handler;
+	}
+
+	/*
+	 * DOM patching
+	 */
 
 	patchThis(dom, edits, attach) {
 		edits = edits || [];
@@ -375,7 +426,7 @@ class Salix {
 		if (this.isAlienDOM(dom)) {
 			// every alien element should have a unique id
 			// to retrieve the associated patch closure
-			this.theAliens[dom.getAttribute('id')](tree.edits, attach);
+			this.theAliens[dom.getAttribute('id')](tree);
 			return;
 		} 
 		this.patchThis(dom, tree.edits, attach);
@@ -388,17 +439,7 @@ class Salix {
 		}
 	}
 
-	setEventListener(dom, key, handler) {
-		var allHandlers = dom.salix_handlers || {};
-		if (allHandlers.hasOwnProperty(key)) {
-			dom.removeEventListener(key, allHandlers[key]);
-			allHandlers[key].stale = true;
-		}
-		allHandlers[key] = handler;
-		dom.addEventListener(key, handler);
-		dom.salix_handlers = allHandlers;
-		return handler;
-	}
+	
 
 	
 	
@@ -447,31 +488,7 @@ class Salix {
 	
 	
 	
-	getDecoder(hnd) {
-		return this.Decoders[hnd.name](hnd.args);
-	}
-	
-	getHandler(hnd) {
-		var handler = event => {
-			event.message = this.makeMessage(hnd.handle, this.getDecoder(hnd)(event));
-			if (event.message) {
-				event.handler = handler; // used to detect staleness
-				this.handle(event);
-			}
-		}
-		return handler;
-	}
-	
 
-	getAlienHandler(hnd) {
-		return function (arg0, arg1, arg2, arg3) {
-			var event = {}; // simulate ordinary event
-			event.message = this.makeMessage(hnd.handle, this.getDecoder(hnd)(arg0, arg1, arg2, arg3))
-			if (event.message) {
-				this.handle(event);
-			}
-		};
-	}
 
 }
 

@@ -25,15 +25,15 @@ data Msg = doIt();
 
 alias CD = void(C, R, N);
 
-alias C = void(str, list[Attr], void(D));
+alias C = void(str, void(D));
 
 alias N = void(str, str);
 
 // from, rel+card, to, str label=""
-alias R = void(str, str, str, list[Attr]);
+alias R = void(str, str, str);
 
 // modifier, name, type
-alias D = void(str, str, str, list[Attr]);
+alias D = void(str, str, str);
 
 Model update(Msg msg, Model m) {
     switch (msg) {
@@ -43,66 +43,64 @@ Model update(Msg msg, Model m) {
 }
 
 void view(Model m) {
-    classDiagram("animal", "Animals", [], (C class, R link, N note) {
+    classDiagram("animal", "Animals", (C class, R link, N note) {
         note("", "From Duck till Zebra");
         note("Duck", "can fly can help in debugging");
 
         if (m) {
-            class("BOOOM", [], (D decl) {
+            class("BOOOM", (D decl) {
                 ;
             });
         }
 
-        class("Animal", [onClick(doIt())], (D decl) { 
-            decl("+", "int", "age", []);
-            decl("+", "String", "gender", []);
-            decl("+", "", "isMammal()", []);
-            decl("+", "", "mate()", []);
+        class("Animal", (D decl) { 
+            decl("+", "int", "age");
+            decl("+", "String", "gender");
+            decl("+", "", "isMammal()");
+            decl("+", "", "mate()");
         });
 
-        class("Duck", [], (D decl) {
-            decl("+", "String", "beakColor", []);
-            decl("+", "", "swim()", []);
-            decl("+", "", "quack", []);
+        class("Duck", (D decl) {
+            decl("+", "String", "beakColor");
+            decl("+", "", "swim()");
+            decl("+", "", "quack");
         });
         
-        class("Fish", [], (D decl) {
-            decl("-", "int", "sizeInFeet", []);
-            decl("-", "", "canEat()", []);
+        class("Fish", (D decl) {
+            decl("-", "int", "sizeInFeet");
+            decl("-", "", "canEat()");
         });
         
-        class("Zebra", [], (D decl) {
-            decl("+", "bool", "is_wild", []);
-            decl("+", "", "run()", []);
+        class("Zebra", (D decl) {
+            decl("+", "bool", "is_wild");
+            decl("+", "", "run()");
         });
 
-        link("Animal", "\<|--", "Duck", []);
-        link("Animal", "\<|--", "Fish", []);
-        link("Animal", "\<|--", "Zebra", []);
+        link("Animal", "\<|--", "Duck");
+        link("Animal", "\<|--", "Fish");
+        link("Animal", "\<|--", "Zebra");
     });
+
+    button(onClick(doIt()), "Do it");
 }
 
 
 
-void classDiagram(str cdname, str title, list[Attr] attrs, CD cd) {
+void classDiagram(str cdname, str title, CD cd) {
   str diagram = "---\n<title>\n---\nclassDiagram\n";
   
   list[Attr] events = [];
 
-  void klass(str name, list[Attr] cattrs, void(D) block) {
+  void klass(str name, void(D) block) {
     diagram += "\tclass <name>{\n\t}\n";
-    void decl(str modifier, str typ, str dname, list[Attr] dattrs) {
+    void decl(str modifier, str typ, str dname) {
         diagram += "\t<name> : <modifier><typ == "" ? "" : "<typ> "><dname>\n";
     }
 
     block(decl);
-    for (Attr a <- cattrs, a is event) {
-        events += [a];
-        diagram += "\tclick <name> call callback_<cdname>_<size(events)>() \"Click\"\n";
-    }
   }
   
-  void relation(str from, str how, str to, list[Attr] rattrs) {
+  void relation(str from, str how, str to) {
     diagram += "\t<from> <how> <to>\n";
   }
 
@@ -118,21 +116,20 @@ void classDiagram(str cdname, str title, list[Attr] attrs, CD cd) {
   
   cd(klass, relation, note);
   
-  div(class("salix-alien"), id(cdname), attr("onclick", "$salix.registerAlien(\'<cdname>\', mermaidPatch_<cdname>);"), () {
+  div(class("salix-alien"), id(cdname), attr("onclick", "$salix.registerAlien(\'<cdname>\', mermaidPatch_<cdname>); $mermaid.init(undefined, \'#<cdname>_mermaid\');"), () {
     script("function mermaidPatch_<cdname>(patch) {
-           '  console.log(JSON.stringify(patch));
-           '  console.log(JSON.stringify(mermaid));
-           '  document.getElementById(\'<cdname>_mermaid\').innerHTML = patch.patches[0].edits[0].content;
+           '  const src = patch.patches[0].patches[0].edits[0].contents;
+           '  const element = document.querySelector(\'#<cdname>_mermaid\');
+           '  element.innerHTML = src;
+           '  element.removeAttribute(\'data-processed\');
+           '  $mermaid.init(undefined, \'#<cdname>_mermaid\');
            '}
-           '<for (int i <- [0..size(events)]) {>
-           'function callback_<cdname>_<i+1>() { 
-           '   $salix.send(<asJSON(events[i].handler)>);
-           '}
-           '<}>");
+           ");
     script(\type("module"),
         "import mermaid from \'https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.esm.min.mjs\';
-        'mermaid.initialize({ startOnLoad: true, securityLevel: \'loose\' });");
-    pre(id("<cdname>_mermaid"), class("mermaid"), diagram);
+        'window.$mermaid = mermaid;
+        '$mermaid.initialize({ startOnLoad: false, securityLevel: \'loose\' });");
+    pre(id("<cdname>_mermaid"), diagram);
   });
 }
 

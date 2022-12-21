@@ -61,16 +61,16 @@ The example here puts all JS inline, but this code can also be in a separate JS 
 If multiple aliens of the same type co-exist in the same page, pass the script loading to withIndex
 to have a single script load for multiple alien elements.
 }
-void cyto(str name, rel[str, str] graph, str width="200px", str height="200px") {
+void cyto(str name, rel[str, str] graph, str width="200px", str height="200px", str \layout="random") {
   withExtra(("graph": graph), () {
     div(class("salix-alien"), id(name), attr("onclick", initCode(name)), () {
         script(src("https://cdn.jsdelivr.net/npm/cytoscape@3.23.0/dist/cytoscape.umd.js"));
         script("function cytopatch(cy, patch) {
                '  console.log(\'patching cyto \' + JSON.stringify(patch.edits));
                '  var g = {elements: []};
-               '  for (let i = 0; i \< edits[0].extra.length; i++) {
-               '    let a = edits[0].extra[i][0];
-               '    let b = edits[0].extra[i][1];
+               '  for (let i = 0; i \< patch.edits[0].extra.length; i++) {
+               '    let a = patch.edits[0].extra[i][0];
+               '    let b = patch.edits[0].extra[i][1];
                '    g.elements.push({data: {id: a}});
                '    g.elements.push({data: {id: b}});
                '    g.elements.push({data: {id: a + b, source: a, target: b}})
@@ -78,13 +78,22 @@ void cyto(str name, rel[str, str] graph, str width="200px", str height="200px") 
                '  g.style = [{selector: \'node\', style: {label: \'data(id)\'}}];
                '  console.log(JSON.stringify(g));
                '  cy.json(g);
-               '  cy.layout({name: \'random\'}).run();
+               '  cy.layout({name: \'<\layout>\'}).run();
                '}");
         div(style(("width": width, "height": height)), id("cyto_" + name));
     });
   });
 }
 
+alias V = void(str, list[Attr]);
+
+alias E = void(str, str, list[Attr]);
+
+void cytoscape(str name, list[Attr] attrs, void(V, E) block) {
+
+  
+
+}
 
 
 void view(Model m) {

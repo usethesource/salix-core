@@ -11,11 +11,11 @@ alias Model = bool;
 
 Model init() = false;
 
-SalixApp[Model] mermaidApp(str id = "alien") 
+SalixApp[Model] classDiagramApp(str id = "alien") 
   = makeApp(id, init, withIndex("Mermaid", id, view), update);
 
-App[Model] mermaidWebApp()
-  = webApp(mermaidApp(), |project://salix/src/main/rascal|);
+App[Model] classDiagramWebApp()
+  = webApp(classDiagramApp(), |project://salix/src/main/rascal|);
 
 
 data Msg = doIt();

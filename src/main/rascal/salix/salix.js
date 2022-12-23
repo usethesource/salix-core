@@ -191,6 +191,7 @@ class Salix {
 	}
 	
 	render(patch) {
+		console.log(JSON.stringify(patch, null, 2));
 		this.patchDOM(this.root(), patch, this.replacer(this.root().parentNode, this.root()));	
 	}
 	
@@ -373,7 +374,7 @@ class Salix {
 				break;
 				
 			case 'appendNode':
-				this.build(edit.html, appender(dom));
+				this.build(edit.html, this.appender(dom));
 				if (this.isAlienVDOM(edit.html)) {
 					this.bootAlien(edit.html);
 				}
@@ -464,7 +465,7 @@ class Salix {
 	    
 	    attach(elt);
 	    for (var i = 0; i < vdom.kids.length; i++) {
-	    	this.build(vdom.kids[i], appender(elt));
+	    	this.build(vdom.kids[i], this.appender(elt));
 	    }
 	}
 	

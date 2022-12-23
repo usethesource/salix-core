@@ -244,7 +244,7 @@ Just like views and subscriptions, commands should be mapped whenever components
 
 - [salix::Node](https://github.com/cwi-swat/salix/blob/master/src/salix/Node.rsc): defines the `Node` data type for representing views. Only needed if you define your own attributes or elements. 
 
-- [salix::Diff](https://github.com/cwi-swat/salix/blob/master/src/salix/Diff.rsc), [salix::Patch](https://github.com/cwi-swat/salix/blob/master/src/salix/Patch.rsc): internal modules for diffing and patching `Node`. You should never have to import these modules. 
+- [salix::Diff](https://github.com/cwi-swat/salix/blob/master/src/salix/Diff.rsc): internal module for diffing and patching `Node`. You should never have to import these modules. 
 
 #### Example programs
 
@@ -289,9 +289,9 @@ You can define a new parser in a similar way, this time dispatching on a differe
 
 Salix can be extended with new kinds of subscriptions and commands, similar to how new handlers are defined (e.g., `targetValue`. The only difference is that instead of the `Hnd` type and the `handler` constructor, you now use `Cmd` and `command`, and `Sub` and `subscription` types and constructors, respectively.  
 
-#### Embedding "native" Javascript components
+#### Embedding "alien" Javascript components
 
-TBD
+TBD. For now, see the folder `salix/alien` for a basic skeleton that illustrates how Salix deals with alien HTML elements.
 
 ## Discussion
 

@@ -204,17 +204,18 @@ private list[map[str, value]] extra = [];
 void withExtra(map[str, value] stuff, void() block) {
   extra += [stuff];
   block();
-  extra = extra[0..-1];
+  //extra = extra[0..-1]; build pops
 }
 
 @doc{The basic build function to construct html elements on the stack.
 The list of argument values can contain any number of Attr values.
-The last argument (if any) can be a block, an Node node, or a value.
+The last argument (if any) can be a blouitck, an Node node, or a value.
 In the latter case it is converted to a txt node.}
 void build(list[value] vals, str tagName) {
   map[str, value] myExtra = ();
   if (size(extra) > 0) {
     myExtra = extra[-1];  
+    extra = extra[0..-1]; // pop here; we don't want  propagate extra down.
   }
 
   push([]); // start a new scope for this element's children
@@ -338,6 +339,9 @@ Msg parseMsg("integer", Handle h, map[str,str] p)
 
 Msg parseMsg("real", Handle h, map[str,str] p)
   = applyMaps(h, decode(h, #Msg(real))(toReal(p["value"])));
+
+Msg parseMsg("values", Handle h, map[str,str] p)
+  = applyMaps(h, decode(h, #Msg(value,value))(p["value1"], p["value2"]));
 
 Msg applyMaps(Handle h, Msg msg) = ( msg | decode(m, #(Msg(Msg)))(it) | int m <- h.maps );
 

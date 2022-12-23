@@ -81,6 +81,9 @@ class Salix {
 				return function (e) { return {type: 'real', value: e.target.value}; };
 			},
 
+			targetValues: function (args) {
+				return function (e) { return {type: 'values', value1: e.value1, value2: e.value2}; };
+			},
 			
 			targetChecked: function (args) {
 				return function (e) { return {type: 'boolean', value: e.target.checked}; };

@@ -484,7 +484,7 @@ class Salix {
 	    
 	    for (var k in vevents) {
 	    	if (vevents.hasOwnProperty(k)) {
-	    		setEventListener(elt, k, getHandler(vevents[k]));
+	    		this.setEventListener(elt, k, this.getHandler(vevents[k]));
 	    	}
 	    }
 	}

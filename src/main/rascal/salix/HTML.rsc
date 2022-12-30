@@ -145,6 +145,10 @@ void menu(value vals...) = build(vals, "menu");
 Attr style(tuple[str, str] styles...) = attr("style", intercalate("; ", ["<k>: <v>" | <k, v> <- styles ])); 
 Attr style(map[str,str] styles) = attr("style", intercalate("; ", ["<k>: <styles[k]>" | k <- styles ])); 
 
+Attr crossorigin(str val) = attr("crossorigin", val);
+Attr integrity(str val) = attr("integrity", val);
+Attr referrerpolicy(str val) = attr("referrerpolicy", val);
+
 Attr align(str val) = attr("align", val);
 Attr valign(str val) = attr("valign", val);
 

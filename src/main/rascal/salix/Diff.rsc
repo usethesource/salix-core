@@ -11,6 +11,8 @@ module salix::Diff
 import salix::Node;
 import List;
 import util::Math;
+import IO;
+import vis::Text;
 
 //bool sanity(Node h1, Node h2) = apply(diff(h1, h2), h1) == h2;
 
@@ -41,7 +43,14 @@ data Edit
 // however, we only diff their bodies. This is (unfortunately)
 // need because some extensions (charts/treeview) modify the
 // head of a document in ways we cannot know about.
-Patch diff(Node old, Node new) = diff(old.kids[1], new.kids[1], -1);
+Patch diff(Node old, Node new) {
+  // println("OLD:");
+  // println(prettyNode(old));
+  // println("NEW:");
+  // println(prettyNode(new));
+  
+  return diff(old.kids[1], new.kids[1], -1);
+} 
 
 Patch diff(Node old, Node new, int idx) {
   if (old.\type is empty) {

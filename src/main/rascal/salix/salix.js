@@ -60,7 +60,7 @@ class Salix {
 				setFocus: args => {
 					var id = args.id;
 					document.getElementById(id).focus();
-					return {};
+					return {type: 'nothing'};
 				}
 		};
 
@@ -114,8 +114,15 @@ class Salix {
 		return dom.className === this.ALIEN_CLASS;
 	}
 
-	registerAlien(id, patcher) {
+	registerAlien(id, patcher, cmds) {
 		this.theAliens[id] = patcher;
+		if (cmds) {
+			for (var k in cmds) {
+				if (cmds.hasOwnProperty(k)) {
+					this.Commands[k] = cmds[k];
+				}
+			}
+		}
 	}
 	
 	bootAlien(alien) {

@@ -49,7 +49,9 @@ Patch diff(Node old, Node new) {
   // println("NEW:");
   // println(prettyNode(new));
   
-  return diff(old.kids[1], new.kids[1], -1);
+  Patch p = diff(old.kids[1], new.kids[1], -1);
+  // println(prettyNode(p));
+  return p;
 } 
 
 Patch diff(Node old, Node new, int idx) {

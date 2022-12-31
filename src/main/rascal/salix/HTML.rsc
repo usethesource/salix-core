@@ -300,4 +300,5 @@ Hnd targetInt(Msg(int) int2msg) = handler("targetInt", encode(int2msg));
 
 Hnd targetReal(Msg(real) real2msg) = handler("targetReal", encode(real2msg));
 
-  
+Hnd jsonPayload(Msg(map[str,value]) json2msg) = handler("jsonPayload", encode(json2msg));
+

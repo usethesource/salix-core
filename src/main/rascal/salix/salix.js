@@ -167,7 +167,7 @@ class Salix {
 	}
 
 	start() {
-		this.bootAliens(); 
+		//this.bootAliens(); (happens after render of init)
 	    fetch(this.makeURL('init'))
           .then(response => response.json())
           .then(data => { this.step(data); this.doSome(); });

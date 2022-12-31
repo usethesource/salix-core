@@ -89,8 +89,8 @@ class Salix {
 				return function (e) { return {type: 'boolean', value: e.target.checked}; };
 			},
 
-			targetJSON: function (args) {
-				return function (obj) { return obj; };
+			jsonPayload: function (args) {
+				return function (obj) { return {type: 'json', payload: obj}; };
 			},
 			
 			keyCode: function (args) {
@@ -144,6 +144,9 @@ class Salix {
 		// also to register the alien to salix.
 		const attr = 'on' + this.ALIEN_EVENT;
 		const handler = alien[attr];
+		if (handler === null) {
+			return; // already booted
+		}
 		alien[attr] = null;
 		alien.removeAttribute(attr);
 		const newHandler = e => { 
@@ -213,6 +216,7 @@ class Salix {
 	render(patch) {
 		//console.log(JSON.stringify(patch, null, 2));
 		this.patchDOM(this.root(), patch, this.replacer(this.root().parentNode, this.root()));	
+		this.bootAliens();
 	}
 	
 	doCommands(cmds) {
@@ -376,9 +380,6 @@ class Salix {
 			
 			case 'replace':
 				this.build(edit.html, attach);
-				if (this.isAlienVDOM(edit.html)) {
-					this.bootAlien(edit.html);
-				}
 				break;
 
 			case 'setText': 
@@ -387,17 +388,11 @@ class Salix {
 				
 			case 'removeNode': 
 				let subject = dom.lastChild;
-				if (this.isAlienDOM(subject)) {
-					delete this.theAliens[subject.getAttribute('id')];
-				}
 				dom.removeChild(subject);
 				break;
 				
 			case 'appendNode':
 				this.build(edit.html, this.appender(dom));
-				if (this.isAlienVDOM(edit.html)) {
-					this.bootAlien(edit.html);
-				}
 				break;
 				
 			case 'setAttr': 
@@ -447,14 +442,17 @@ class Salix {
 	}
 	
 	patchDOM(dom, tree, attach) {
+		this.patchThis(dom, tree.edits, attach);
+
 		if (this.isAlienDOM(dom)) {
 			// every alien element should have a unique id
 			// to retrieve the associated patch closure
 			this.theAliens[dom.getAttribute('id')](tree);
 			return;
 		} 
-		this.patchThis(dom, tree.edits, attach);
 		
+
+
 		var patches = tree.patches || [];
 		for (var i = 0; i < patches.length; i++) {
 			var p = patches[i];

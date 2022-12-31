@@ -15,6 +15,7 @@ import salix::Diff;
 
 import util::Webserver;
 import util::Maybe;
+import lang::json::IO;
 import IO;
 import String;
 
@@ -29,7 +30,7 @@ the basic workflow of Salix.}
 data SalixRequest
   = boot()
   | begin()
-  | message(map[str, str] params)
+  | message(map[str, value] params)
   ;
   
 data SalixResponse
@@ -101,7 +102,7 @@ SalixApp[&T] makeApp(str appId, &T() init, void(&T) view, &T(Msg, &T) update,
       } 
 
 	  // otherwise parse the message and do transition
-      case message(map[str,str] params): {
+      case message(map[str,value] params): {
         Msg msg = params2msg(params, parser);
         
         //if (debug) {
@@ -163,7 +164,8 @@ App[&T] webApp(SalixApp[&T] app, loc static, map[str,str] headers = ()) {
       return respondHttp(app.rr(begin()));
     }
     if (get("/<app.id>/msg") := req) { 
-      return respondHttp(app.rr(message(req.parameters)));
+      map[str, value] payload = parseJSON(#map[str,value], req.parameters["payload"]);
+      return respondHttp(app.rr(message(payload)));
     }
      
     return response(notFound(), "not handled: <req.path>");

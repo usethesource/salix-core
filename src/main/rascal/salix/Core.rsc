@@ -17,6 +17,7 @@ import salix::Node;
 import List;
 import String;
 import IO;
+import lang::json::IO; // todo: typed JSON messages
 
 
 
@@ -312,38 +313,46 @@ data Hnd // Handlers for events
  * Message parsing
  */  
   
-alias Parser = Msg(str,Handle,map[str,str]);  
+alias Parser = Msg(str,Handle,map[str,value]);  
   
 @doc{Convert request parameters to a Msg value. Active mappers at `path`
 transform the message according to f.}
-Msg params2msg(map[str, str] params, Parser parse) 
+Msg params2msg(map[str, value] params, Parser parse) 
   = parse(params["type"], toHandle(params), params);
 
 @doc{Parse request parameters into a Handle.}
-Handle toHandle(map[str, str] params)
-  = handle(toInt(params["id"]), maps=toMaps(params["maps"] ? ""));
+Handle toHandle(map[str, value] params)
+  = handle(params["id"], maps=toMaps(params["maps"] ? ""));
 
 list[int] toMaps(str x) = [ toInt(i) | str i <- split(";", x), i != "" ];
 
-Msg parseMsg("nothing", Handle h, map[str, str] p) 
+Msg parseMsg("nothing", Handle h, map[str, value] p) 
   = applyMaps(h, decode(h, #Msg)); 
 
-Msg parseMsg("string", Handle h, map[str,str] p) 
-  = applyMaps(h, decode(h, #Msg(str))(p["value"]));
+Msg parseMsg("string", Handle h, map[str,value] p) 
+  = applyMaps(h, decode(h, #Msg(str))(v))
+  when str v := p["value"];
 
-Msg parseMsg("boolean", Handle h, map[str,str] p) 
+Msg parseMsg("boolean", Handle h, map[str, value] p) 
   = applyMaps(h, decode(h, #Msg(bool))(p["value"] == "true"));
 
-Msg parseMsg("integer", Handle h, map[str,str] p) 
-  = applyMaps(h, decode(h, #Msg(int))(toInt(p["value"])));
+Msg parseMsg("integer", Handle h, map[str, value] p) 
+  = applyMaps(h, decode(h, #Msg(int))(p["value"]));
 
-Msg parseMsg("real", Handle h, map[str,str] p)
-  = applyMaps(h, decode(h, #Msg(real))(toReal(p["value"])));
+Msg parseMsg("real", Handle h, map[str,value] p)
+  = applyMaps(h, decode(h, #Msg(real))(p["value"]));
 
-Msg parseMsg("values", Handle h, map[str,str] p)
+Msg parseMsg("values", Handle h, map[str,value] p)
   = applyMaps(h, decode(h, #Msg(value,value))(p["value1"], p["value2"]));
 
+Msg parseMsg("json", Handle h, map[str, value] p)
+  = applyMaps(h, decode(h, t)(p))
+  when type[Msg(map[str,value])] t := #Msg(map[str,value]);
+
+
 Msg applyMaps(Handle h, Msg msg) = ( msg | decode(m, #(Msg(Msg)))(it) | int m <- h.maps );
+
+
 
 /*
  * Mapping

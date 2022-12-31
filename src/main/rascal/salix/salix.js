@@ -42,7 +42,7 @@ class Salix {
 		
 		this.Subscriptions = {
 			timeEvery: (h, args) => {
-				var timer = setInterval(function() {
+				var timer = setInterval(() => {
 					var data = {type: 'integer', value: (new Date().getTime() / 1000) | 0};
 					this.handle({message: this.makeMessage(h, data)}); 
 				}, args.interval);
@@ -88,6 +88,10 @@ class Salix {
 			targetChecked: function (args) {
 				return function (e) { return {type: 'boolean', value: e.target.checked}; };
 			},
+
+			targetJSON: function (args) {
+				return function (obj) { return obj; };
+			},
 			
 			keyCode: function (args) {
 				return function (e) {
@@ -100,8 +104,10 @@ class Salix {
 	makeURL(msg, data) {
 	    var base = (this.host || '') + '/' + this.appId + '/' + msg;
 	    if (data) {
-	    	base += '?' + new URLSearchParams(data).toString();
+			let str = JSON.stringify(data);
+	    	base += '?payload=' + encodeURIComponent(str);
 	    }
+		
 	    return base;
 	}
 	
@@ -114,12 +120,19 @@ class Salix {
 		return dom.className === this.ALIEN_CLASS;
 	}
 
-	registerAlien(id, patcher, cmds) {
+	registerAlien(id, patcher, cmds, decs) {
 		this.theAliens[id] = patcher;
 		if (cmds) {
 			for (var k in cmds) {
 				if (cmds.hasOwnProperty(k)) {
 					this.Commands[k] = cmds[k];
+				}
+			}
+		}
+		if (decs) {
+			for (var k in decs) {
+				if (decs.hasOwnProperty(k)) {
+					this.Decoders[k] = decs[k];
 				}
 			}
 		}

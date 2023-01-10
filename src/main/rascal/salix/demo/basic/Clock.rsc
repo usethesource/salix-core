@@ -15,14 +15,16 @@ import salix::Core;
 import util::Math;
 import salix::Index;
 
+App[Model] clockWebApp() = webApp(clockApp(), |project://salix/src/main/rascal|);
+
+SalixApp[Model] clockApp(str id = "root") 
+  = makeApp(id, init, withIndex("Clock", id, view), update, subs=subs);
+
 alias Model = tuple[int time, bool running];
 
 Model init() = <1, false>;
 
-data Msg
-  = tick(int time)
-  | toggle()
-  ;
+data Msg = tick(int time) | toggle();
 
 list[Sub] subs(Model m) = [timeEvery(tick, 1000) | m.running ];
 
@@ -33,15 +35,6 @@ Model update(Msg msg, Model t) {
   }
   return t;
 }
-
-SalixApp[Model] clockApp(str id = "root") 
-  = makeApp(id, init, withIndex("Clock", id, view), update, subs=subs);
-
-App[Model] clockWebApp() 
-  = webApp(
-      clockApp(),
-      |project://salix/src/main/rascal|
-    );
 
 void view(Model m) {
   h2("Clock using SVG");

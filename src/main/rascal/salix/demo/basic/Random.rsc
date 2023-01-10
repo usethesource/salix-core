@@ -13,43 +13,31 @@ import salix::Core;
 import salix::App;
 import salix::Index;
 
-alias Model = tuple[int dieFace];
-
-data Msg
-  = roll()
-  | newFace(int face)
-  ;
 
 SalixApp[Model] randomApp(str id = "root") 
   = makeApp(id, init, withIndex("Random", id, view), update);
 
 // Single
-App[Model] randomWebApp() 
-  = webApp(
-      randomApp(),
-      |project://salix/src/main/rascal|
-    );
+App[Model] randomWebApp() = webApp(randomApp(), |project://salix/src/main/rascal|);
 
+
+alias Model = tuple[int dieFace];
 
 Model init() = <1>;
 
+data Msg = roll() | newFace(int face);
+
 Model update(Msg msg, Model m) {
-  switch (msg) {
-    
-    case roll(): 
-      do(random(newFace, 1, 6));
-    
-    case newFace(int n): 
-      m.dieFace = n; 
-  
+  switch (msg) {    
+    case roll():  do(random(newFace, 1, 6)); 
+    case newFace(int n): m.dieFace = n; 
   }
-  
   return m;
 }
 
 void view(Model m) {
- button(onClick(roll()), "Roll");
- text(m.dieFace);
+  button(onClick(roll()), "Roll");
+  text(m.dieFace);
 }
    
 // Twice
@@ -60,29 +48,25 @@ App[TwiceModel] twiceWebApp()
       |project://salix/src/main/rascal|
     ); 
 
-data TwiceModel 
-  = twice(Model model1, Model model2);
-
 TwiceModel twiceInit() = twice(init(), init());
+
+data TwiceModel = twice(Model model1, Model model2);
 
 data Msg = sub1(Msg msg) | sub2(Msg msg);
 
 TwiceModel twiceUpdate(Msg msg, TwiceModel m) {
   switch (msg) {
     case sub1(Msg s):
-      m.model1 = mapCmds(sub1, s, m.model1, update);
-      
+      m.model1 = mapCmds(sub1, s, m.model1, update);   
     case sub2(Msg s):
       m.model2 = mapCmds(sub2, s, m.model2, update);
   }
-  
   return m;
 }
 
 void twiceView(TwiceModel m) {
   h2("Two times roll a die");
   mapView(sub1, m.model1, view);
-  
   mapView(sub2, m.model2, view);
 }
 

@@ -214,7 +214,7 @@ class Salix {
 	}
 	
 	render(patch) {
-		console.log(JSON.stringify(patch, null, 2));
+		//console.log(JSON.stringify(patch, null, 2));
 		this.patchDOM(this.root(), patch, this.replacer(this.root().parentNode, this.root()));	
 		this.bootAliens();
 	}

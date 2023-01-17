@@ -248,7 +248,7 @@ Just like views and subscriptions, commands should be mapped whenever components
 
 #### Example programs
 
-Check out the [demo folder](salix-core/blob/master/src/salix/demo/).
+Check out the [demo folder](salix-core/blob/master/src/main/rascal/salix/demo/).
 
 
 ### Extending the Framework
@@ -336,7 +336,7 @@ In Salix, I've opted to not make the node and attribute types parametric, since 
 
 Whenever a component is nested inside another one, the mapping of command and event messages ensures that messages created in a child component will be routed back to that very same child component. Sometimes, however, you'd like to communicate message *up*, because the responsibility of handling them lies outside the local level.
  
-Here's an example. Imagin a read-eval-print-loop (REPL) component showing a commandline where commands can be entered. The REPL is in charge of maintaining history, printing the prompt, interpreting key strokes etc. Whenever the user presses enter however, some command or expression needs to be evaluated, but this is not the responsibility of the REPL itself: the effect of evaluation depends on what the REPL is used for, probably defined in its container. 
+Here's an example. Imagine a read-eval-print-loop (REPL) component showing a commandline where commands can be entered. The REPL is in charge of maintaining history, printing the prompt, interpreting key strokes etc. Whenever the user presses enter however, some command or expression needs to be evaluated, but this is not the responsibility of the REPL itself: the effect of evaluation depends on what the REPL is used for, probably defined in its container. 
 
 Part of the solution is to pass down an `eval` function to the `update` function of the REPL component. Whenever the user now presses enter, the REPL will call that `eval` function, and print out the result at the command line. This is only half the story however: often the evaluation of a command also requires some domain-specific effect outside the REPL itself. How do we get it there? We can't simply trigger messages from the REPL, since nesting the REPL in some context using mapping will make them "local" to the REPL.
 
@@ -390,11 +390,8 @@ So update functions can not only pass arbitrary additional data down the compone
 
 #### How are lists of commands executed?
 
-Lists of commands are executed in sequence, causing one synchronous roundtrip to the server at every step. Commands are furthermore always executed before any (queued) events are handled, because commands might invalidate the UI that was actual at the time of queueing such events. It's perfectly possible to starve the UI by producing an infinite command loop. 
-
-One invocation of a model update function might produce a list of commands. Since every message sent back to the server produces a new model, this means that messages from consecutive commands, will be processed in the context of consecutive models, and *not* on the original model that produced the list of commands in the first place. Worse, if such intermediate steps on the model produce commands themselves, they are executed first, before continuing on the remainder of the original list of commands. 
-
-*Aside*: this describes the current situation of the implementation; I'm unsure of the general semantics of sequences of commands produced by a single `update` step. An obvious way out would be to disallow sequences of commands and only allow a single one per update; but, on the other hand, this seems overly restricted and inflexible. 
+They shouldn't. In Elm, a `Cmd` is tupled with the result model in the return type of the update function. 
+In Salix this means that you can only call `do` once in the `update` function.
 
 #### Why is it 'slow'?
 

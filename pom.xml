@@ -1,119 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.rascalmpl</groupId>
-  <artifactId>salix-core</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+<groupId>org.rascalmpl</groupId>
+<artifactId>salix-core</artifactId>
+<version>0.1.0-SNAPSHOT</version>
 
-  <properties>
+<properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+</properties>
 
-  <repositories>
+<repositories>
     <repository>
         <id>usethesource</id>
         <url>https://releases.usethesource.io/maven/</url>
     </repository>
-  </repositories>
+</repositories>
 
-  <pluginRepositories>
+<pluginRepositories>
     <pluginRepository>
-       <id>usethesource</id>
-       <url>https://releases.usethesource.io/maven/</url>
+        <id>usethesource</id>
+        <url>https://releases.usethesource.io/maven/</url>
     </pluginRepository>
-  </pluginRepositories>
+</pluginRepositories>
 
-  <dependencies>
+<dependencies>
     <dependency>
-      <groupId>org.rascalmpl</groupId>
-      <artifactId>rascal</artifactId>
-      <version>0.28.4</version>
+        <groupId>org.rascalmpl</groupId>
+        <artifactId>rascal</artifactId>
+        <version>0.28.4</version>
     </dependency>
-  </dependencies>
+</dependencies>
 
-  <build>
-      <sourceDirectory>src/main/rascal</sourceDirectory>
-      <resources>
-          <resource>
-              <directory>src/main/rascal</directory>
-              <excludes>
-                  <exclude>**/*.java</exclude>
-                  <exclude>**/*.class</exclude>
-              </excludes>
-          </resource>
-          <resource>
-              <directory>.</directory>
-              <filtering>false</filtering>
-              <includes>
-                  <include>META-INF/RASCAL.MF</include>
-                  <include>src/main/rascal/**/*.rsc</include>
-                  <include>src/main/rascal/**/*.css</include>
-                  <include>src/main/rascal/**/*.js</include>
-              </includes>
-          </resource>
-      </resources>
+<build>
+    <sourceDirectory>src/main/rascal</sourceDirectory>
+    <resources>
+        <resource>
+            <directory>src/main/rascal</directory>
+            <excludes>
+                <exclude>**/*.java</exclude>
+                <exclude>**/*.class</exclude>
+            </excludes>
+        </resource>
+        <resource>
+            <directory>.</directory>
+            <filtering>false</filtering>
+            <includes>
+                <include>META-INF/RASCAL.MF</include>
+                <include>src/main/rascal/**/*.rsc</include>
+                <include>src/main/rascal/**/*.css</include>
+                <include>src/main/rascal/**/*.js</include>
+            </includes>
+        </resource>
+    </resources>
 
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
-        <configuration>
-          <compilerArgument>-parameters</compilerArgument> 
-          <release>11</release>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.rascalmpl</groupId>
-        <artifactId>rascal-maven-plugin</artifactId>
-        <version>0.16.0</version>
-        <configuration>
-          <errorsAsWarnings>false</errorsAsWarnings>
-          <bin>${project.build.outputDirectory}</bin>
-          <srcs>
-            <src>${project.basedir}/src/main/rascal</src>
-          </srcs>
-      </configuration>
-      <executions>
-          <execution>
-              <id>compile</id>
-              <phase>compile</phase>
-              <goals>
-                  <goal>compile</goal>
-              </goals>
-          </execution>
-          <execution>
-              <id>package</id>
-              <phase>pre-package</phase>
-              <goals>
-                  <goal>package</goal>
-              </goals>
-          </execution>
-          <execution>
-              <id>tutor-compile</id>
-              <phase>compile</phase>
-              <goals>
-                  <goal>tutor</goal>
-              </goals>
-              <configuration>
-                  <enableStandardLibrary>true</enableStandardLibrary>
-                  <errorsAsWarnings>false</errorsAsWarnings>
-                  <bin>${project.build.outputDirectory}</bin>
-                  <license>${project.basedir}/LICENSE</license>
-                  <sources>|http://github.com/usethesource/salix-core|</sources>
-                  <issues>|http://github.com/usethesource/salix-core/issues|</issues>
-                  <srcs>
-                      <src>${project.basedir}/src</src>
-                  </srcs>
-                  <ignores>
-                  </ignores>
-              </configuration>
-          </execution>
-      </executions>
-  </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.0</version>
+            <configuration>
+                <compilerArgument>-parameters</compilerArgument> 
+                <release>11</release>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.rascalmpl</groupId>
+            <artifactId>rascal-maven-plugin</artifactId>
+            <version>0.16.0</version>
+            <configuration>
+                <errorsAsWarnings>false</errorsAsWarnings>
+                <bin>${project.build.outputDirectory}</bin>
+                <srcs>
+                    <src>${project.basedir}/src/main/rascal</src>
+                </srcs>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>compile</id>
+                    <phase>compile</phase>
+                    <goals>
+                        <goal>compile</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>package</id>
+                    <phase>pre-package</phase>
+                    <goals>
+                        <goal>package</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>tutor-compile</id>
+                    <phase>compile</phase>
+                    <goals>
+                        <goal>tutor</goal>
+                    </goals>
+                    <configuration>
+                        <enableStandardLibrary>true</enableStandardLibrary>
+                        <errorsAsWarnings>false</errorsAsWarnings>
+                        <bin>${project.build.outputDirectory}</bin>
+                        <license>${project.basedir}/LICENSE</license>
+                        <sources>|http://github.com/usethesource/salix-core|</sources>
+                        <issues>|http://github.com/usethesource/salix-core/issues|</issues>
+                        <srcs>
+                            <src>${project.basedir}/src</src>
+                        </srcs>
+                        <ignores>
+                        </ignores>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-release-plugin</artifactId>
+            <version>2.5.3</version>
+            <configuration>
+                <tagNameFormat>v@{project.version}</tagNameFormat>
+                <arguments>-Drascal.compile.skip -DskipTests -Drascal.tutor.skip</arguments>
+            </configuration>
+        </plugin>
     </plugins>
-  </build>
+</build>
 </project>
     

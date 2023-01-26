@@ -99,7 +99,7 @@
                     </goals>
                     <configuration>
                         <enableStandardLibrary>true</enableStandardLibrary>
-                        <errorsAsWarnings>false</errorsAsWarnings>
+                        <errorsAsWarnings>true</errorsAsWarnings>
                         <bin>${project.build.outputDirectory}</bin>
                         <license>${project.basedir}/LICENSE</license>
                         <sources>|http://github.com/usethesource/salix-core|</sources>

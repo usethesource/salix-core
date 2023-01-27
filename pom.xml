@@ -108,7 +108,7 @@
                         <sources>|http://github.com/usethesource/salix-core|</sources>
                         <issues>|http://github.com/usethesource/salix-core/issues|</issues>
                         <srcs>
-                            <src>${project.basedir}/src</src>
+                            <src>${project.basedir}/src/main/rascal</src>
                         </srcs>
                         <ignores>
                         </ignores>

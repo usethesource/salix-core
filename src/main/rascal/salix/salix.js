@@ -167,7 +167,7 @@ class Salix {
 	}
 
 	start() {
-		//this.bootAliens(); (happens after render of init)
+		this.bootAliens(); 
 	    fetch(this.makeURL('init'))
           .then(response => response.json())
           .then(data => { this.step(data); this.doSome(); });
@@ -442,8 +442,7 @@ class Salix {
 	}
 	
 	patchDOM(dom, tree, attach) {
-		this.patchThis(dom, tree.edits, attach);
-
+		
 		if (this.isAlienDOM(dom)) {
 			// every alien element should have a unique id
 			// to retrieve the associated patch closure
@@ -451,6 +450,8 @@ class Salix {
 			return;
 		} 
 		
+
+		this.patchThis(dom, tree.edits, attach);
 
 
 		var patches = tree.patches || [];

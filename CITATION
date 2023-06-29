@@ -2,8 +2,7 @@ Tijs van der Storm, & Jurgen J. Vinju. (2023). usethesource/salix-core: v0.1.0-R
 
 ```bibtex
 @software{tijs_van_der_storm_2023_8094140,
-  author       = {Tijs van der Storm and
-                  Jurgen J. Vinju},
+  author       = {Tijs van der Storm},
   title        = {usethesource/salix-core: v0.1.0-RC2},
   month        = jun,
   year         = 2023,

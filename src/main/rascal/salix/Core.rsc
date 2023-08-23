@@ -244,7 +244,12 @@ void build(list[value] vals, str tagName) {
 }
 
 @doc{Create a text node from an arbitrary value.}
-void _text(value v) = add(hnode(txt(), contents="<v>")); // TODO: HTML encode.
+void _text(value v) {
+  str s = "<v>";
+  if (s != "") { // empty strings don't add nodes
+    add(hnode(txt(), contents="<v>")); // TODO: HTML encode.
+  }
+} 
 
 
 /*

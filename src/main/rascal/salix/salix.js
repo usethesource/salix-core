@@ -450,7 +450,8 @@ class Salix {
 			return;
 		} 
 		
-
+		// todo: this has to be also done for aliens
+		// somehow, to be able to remove the alien
 		this.patchThis(dom, tree.edits, attach);
 
 

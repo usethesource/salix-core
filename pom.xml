@@ -4,11 +4,11 @@
 
     <groupId>org.rascalmpl</groupId>
     <artifactId>salix-core</artifactId>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.2.0-RC1</version>
 
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/usethesource/salix-core.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v0.2.0-RC1</tag>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

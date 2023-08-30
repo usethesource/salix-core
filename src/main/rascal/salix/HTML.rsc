@@ -149,6 +149,8 @@ Attr crossorigin(str val) = attr("crossorigin", val);
 Attr integrity(str val) = attr("integrity", val);
 Attr referrerpolicy(str val) = attr("referrerpolicy", val);
 
+Attr role(str val) = attr("role", val);
+
 Attr align(str val) = attr("align", val);
 Attr valign(str val) = attr("valign", val);
 

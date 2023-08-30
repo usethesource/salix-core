@@ -38,9 +38,9 @@ Model update(Msg msg, Model m) {
 }
 
 void view(Model m) {
-  h2("My first counter app in Rascal");
+  h2(id("header"), "My first counter app in Rascal");
   button(onClick(inc()), "+");
-  div("<m.count>");
+  div(id("thecount"), "<m.count>");
   button(onClick(dec()), "-");	
 }
 

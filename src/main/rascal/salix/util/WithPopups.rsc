@@ -86,13 +86,16 @@ mapping CSS selectors (strings) to Popup values (see above). This function is pr
 intended for creating explanatory screenshots for documentation or slide decks.
 The resulting page view is not interactive anymore; events are simply ignored. 
 }
-App[&T] withPopupsWeb(Popups popups, &T appModel, void(&T) appView, str title, str css=DEFAULT_CSS)
-  = webApp(withPopups(popups, appModel, appView, title, css=DEFAULT_CSS), |project://salix/src/main/rascal|);
+App[&T] withPopupsWeb(Popups popups, &T appModel, void(&T) appView, str title
+                     , str extraCss=DEFAULT_CSS, list[str] css=[], list[str] scripts=[])
+  = webApp(withPopups(popups, appModel, appView, title
+                     , extraCss=extraCss, css=css, scripts=scripts), |project://salix/src/main/rascal|);
 
 
-SalixApp[&T] withPopups(Popups popups, &T appModel, void(&T) appView, str title, str css=DEFAULT_CSS, str id = "root") 
+SalixApp[&T] withPopups(Popups popups, &T appModel, void(&T) appView, str title
+                      , str extraCss=DEFAULT_CSS, list[str] css=[], list[str] scripts=[], str id = "root") 
   = makeApp(id, &T () { return appModel; }
-    , withIndex(title, id, void(&T m) { withPopupView(popups, m, appView, css); })
+    , withIndex(title, id, void(&T m) { withPopupView(popups, m, appView, extraCss); }, css=css, scripts=scripts)
         , &T(Msg _, &T _) { return appModel; }
         );
 

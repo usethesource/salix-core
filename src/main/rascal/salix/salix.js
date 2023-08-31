@@ -170,7 +170,16 @@ class Salix {
 		this.bootAliens(); 
 	    fetch(this.makeURL('init'))
           .then(response => response.json())
-          .then(data => { this.step(data); this.doSome(); });
+          .then(data => { this.step(data); this.doSome(); })
+		  .catch(this.serverError);
+	}
+
+	serverError(err) {
+		err.text().then(txt => {
+			document.open();
+			document.write(txt);
+			document.close();
+		});
 	}
 	
 	root() {
@@ -189,16 +198,24 @@ class Salix {
 				}
 				this.renderRequested = true;
 				fetch(this.makeURL('msg', event.message))
-				   .then(response => response.json())
-				   .then(data => this.step(data))
+				   .then(response => {
+						if (!response.ok) {
+							return Promise.reject(response);
+						}
+						return response.json();
+				   })
+				   .then(data => {
+						this.step(data);
+				   })
 				   .catch(error => {
+						this.serverError(error);
 				  	    this.renderRequested = false;
-					    window.requestAnimationFrame(() => this.doSome());
-					    document.body.style.cursor = 'auto';
+					    this.queue = [];
 				    });
 				
 				break; // process one event at a time
 			}
+			document.body.style.cursor = 'auto';
 		}
 	}
 	
@@ -210,7 +227,6 @@ class Salix {
 		// .always on the get request doesn't work....
 		this.renderRequested = false;
 		window.requestAnimationFrame(() => this.doSome());
-		document.body.style.cursor = 'auto';
 	}
 	
 	render(patch) {

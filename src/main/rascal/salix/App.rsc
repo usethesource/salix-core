@@ -84,14 +84,16 @@ SalixApp[&T] makeApp(str appId, &T() init, void(&T) view, &T(Msg, &T) update,
       
       // pre-initially, render the document
       case boot(): {
-        <initCmds, model> = initialize(init, view);
-        currentModel = just(model);
+        if (currentModel is nothing) {
+          <initCommands, model> = initialize(init, view);
+          currentModel = just(model);
+        }
         
         // ugly, but needed: the init event has to have the effect
         // that the events/properties are correctly set. We cannot
         // set them here, because they don't have a textual HTML
         // representation. 
-        currentView = bareHtml(render(model, view));
+        currentView = bareHtml(render(currentModel.val, view));
         
         resp = document(currentView);
       }

@@ -350,6 +350,25 @@ Msg parseMsg("real", Handle h, map[str,value] p)
 Msg parseMsg("values", Handle h, map[str,value] p)
   = applyMaps(h, decode(h, #Msg(value,value))(p["value1"], p["value2"]));
 
+alias XY = tuple[int x, int y];
+alias MouseXY = tuple[XY client, XY movement, XY offset, XY page, XY screen];
+
+Msg parseMsg("mouseXY", Handle h, map[str,value] p)
+  = applyMaps(h, decode(h, #(Msg(MouseXY)))(<
+      <clientX, clientY>,
+      <movementX, movementY>,
+      <offsetX, offsetY>,
+      <pageX, pageY>,
+      <screenX, screenY>
+    >))
+  when 
+    int clientX := p["clientX"], int clientY := p["clientY"],
+    int movementX := p["movementX"], int movementY := p["movementY"],
+    int offsetX := p["offsetX"], int offsetY := p["offsetY"],
+    int pageX := p["pageX"], int pageY := p["pageY"],
+    int screenX := p["screenX"], int screenY := p["screenY"];
+
+
 Msg parseMsg("json", Handle h, map[str, value] p)
   = applyMaps(h, decode(h, t)(p))
   when type[Msg(map[str,value])] t := #Msg(map[str,value]);

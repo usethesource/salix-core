@@ -264,8 +264,8 @@ Attr cellspacing(str val) = attr("cellspacing", val);
  
 Attr onKeyPress(Msg(int) msg) = event("keypress", keyCode(msg));
 Attr onKeyDown(Msg(int) msg) = event("keydown", keyCode(msg));
-Attr onClick(Msg msg) = event("click", succeed(msg));
 
+Attr onClick(Msg msg) = event("click", succeed(msg));
 Attr onDoubleClick(Msg msg) = event("dblclick", succeed(msg));
 Attr onMouseDown(Msg msg) = event("mousedown", succeed(msg));
 Attr onMouseUp(Msg msg) = event("mouseup", succeed(msg));
@@ -273,6 +273,17 @@ Attr onMouseEnter(Msg msg) = event("mouseenter", succeed(msg));
 Attr onMouseLeave(Msg msg) = event("mouseleave", succeed(msg));
 Attr onMouseOver(Msg msg) = event("mouseover", succeed(msg));
 Attr onMouseOut(Msg msg) = event("mouseout", succeed(msg));
+
+Attr onClickXY(Msg(MouseXY) f) = event("click", mouseXY(f));
+Attr onDoubleClickXY(Msg(MouseXY) f) = event("dblclick", mouseXY(f));
+Attr onMouseDownXY(Msg(MouseXY) f) = event("mousedown", mouseXY(f));
+Attr onMouseUpXY(Msg(MouseXY) f) = event("mouseup", mouseXY(f));
+Attr onMouseEnterXY(Msg(MouseXY) f) = event("mouseenter", mouseXY(f));
+Attr onMouseLeaveXY(Msg(MouseXY) f) = event("mouseleave", mouseXY(f));
+Attr onMouseOverXY(Msg(MouseXY) f) = event("mouseover", mouseXY(f));
+Attr onMouseOutXY(Msg(MouseXY) f) = event("mouseout", mouseXY(f));
+
+
 Attr onSubmit(Msg msg) = event("submit", succeed(msg));
 Attr onBlur(Msg msg) = event("blur", succeed(msg));
 Attr onFocus(Msg msg) = event("focus", succeed(msg));
@@ -301,6 +312,8 @@ Hnd keyCode(Msg(int) int2msg) = handler("keyCode", encode(int2msg));
 Hnd targetInt(Msg(int) int2msg) = handler("targetInt", encode(int2msg));
 
 Hnd targetReal(Msg(real) real2msg) = handler("targetReal", encode(real2msg));
+
+Hnd mouseXY(Msg(MouseXY) xy2msg) = handler("mouseXY", encode(xy2msg));
 
 Hnd jsonPayload(Msg(map[str,value]) json2msg) = handler("jsonPayload", encode(json2msg));
 

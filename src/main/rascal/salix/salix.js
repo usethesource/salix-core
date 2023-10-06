@@ -89,6 +89,21 @@ class Salix {
 				return function (e) { return {type: 'boolean', value: e.target.checked}; };
 			},
 
+			mouseXY: function(args) {
+				return function (e) { return {type: 'mouseXY',
+					clientX: e.clientX,
+					clientY: e.clientY,
+					movementX: e.movementX,
+					movementY: e.movementY,
+					offsetX: e.offsetX,
+					offsetY: e.offsetY,
+					pageX: e.pageX,
+					pageY: e.pageY,
+					screenX: e.screenX,
+					screenY: e.screenY}			
+				}
+			},
+
 			jsonPayload: function (args) {
 				return function (obj) { return {type: 'json', payload: obj}; };
 			},

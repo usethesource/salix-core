@@ -184,7 +184,13 @@ class Salix {
 	start() {
 		this.bootAliens(); 
 	    fetch(this.makeURL('init'))
-          .then(response => response.json())
+          .then(response => {
+			if (!response.ok) {
+				return Promise.reject(response);
+			}
+			return response.json();
+		  })
+		  .catch(this.serverError)
           .then(data => { this.step(data); this.doSome(); })
 		  .catch(this.serverError);
 	}
@@ -219,6 +225,7 @@ class Salix {
 						}
 						return response.json();
 				   })
+				   .catch(this.serverError)
 				   .then(data => {
 						this.step(data);
 				   })
@@ -288,7 +295,7 @@ class Salix {
 			if (this.subscriptions.hasOwnProperty(k)) {
 				for (var i = 0; i < subs.length; i++) {
 					var sub = subs[i];
-					var id = sub.subscription.handle.handle.id;
+					var id = sub.handle.id;
 					if (('' + id) === k) {
 						continue outer;
 					}
@@ -404,6 +411,7 @@ class Salix {
 	patchThis(dom, edits, attach) {
 		edits = edits || [];
 
+
 		for (var i = 0; i < edits.length; i++) {
 			var edit = edits[i];
 
@@ -418,8 +426,7 @@ class Salix {
 				break;			
 				
 			case 'removeNode': 
-				let subject = dom.lastChild;
-				dom.removeChild(subject);
+				dom.removeChild(dom.lastChild);
 				break;
 				
 			case 'appendNode':
@@ -457,6 +464,10 @@ class Salix {
 				delete dom.salix_handlers[key]
 				break;
 				
+			case 'setExtra':
+			case 'removeExtra':
+				break; 
+
 			default: 
 				throw 'unsupported edit: ' + JSON.stringify(edit);
 				
@@ -474,17 +485,20 @@ class Salix {
 	
 	patchDOM(dom, tree, attach) {
 		
+		
+		 
+		
+
+		// todo: this has to be also done for aliens
+		// somehow, to be able to remove the alien
+		this.patchThis(dom, tree.edits, attach);
+		
 		if (this.isAlienDOM(dom)) {
 			// every alien element should have a unique id
 			// to retrieve the associated patch closure
 			this.theAliens[dom.getAttribute('id')](tree);
 			return;
-		} 
-		
-		// todo: this has to be also done for aliens
-		// somehow, to be able to remove the alien
-		this.patchThis(dom, tree.edits, attach);
-
+		}
 
 		var patches = tree.patches || [];
 		for (var i = 0; i < patches.length; i++) {
@@ -492,6 +506,7 @@ class Salix {
 			var kid = dom.childNodes[p.pos];
 			this.patchDOM(kid, p, this.replacer(dom, kid));
 		}
+
 	}
 
 	

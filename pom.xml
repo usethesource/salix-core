@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.rascalmpl</groupId>
             <artifactId>rascal</artifactId>
-            <version>0.34.0</version>
+            <version>0.40.2</version>
         </dependency>
     </dependencies>
 
@@ -71,7 +71,7 @@
             <plugin>
                 <groupId>org.rascalmpl</groupId>
                 <artifactId>rascal-maven-plugin</artifactId>
-                <version>0.23.1</version>
+                <version>0.27.3</version>
                 <configuration>
                     <errorsAsWarnings>true</errorsAsWarnings>
                     <bin>${project.build.outputDirectory}</bin>
@@ -104,9 +104,6 @@
                             <enableStandardLibrary>true</enableStandardLibrary>
                             <errorsAsWarnings>false</errorsAsWarnings>
                             <bin>${project.build.outputDirectory}</bin>
-                            <license>${project.basedir}/LICENSE</license>
-                            <funding>${project.basedir}/FUNDING</funding>
-                            <releaseNotes>${project.basedir}/RELEASE-NOTES</releaseNotes>
                             <sources>|http://github.com/usethesource/salix-core|</sources>
                             <issues>|http://github.com/usethesource/salix-core/issues|</issues>
                             <srcs>

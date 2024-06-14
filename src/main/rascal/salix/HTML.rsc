@@ -225,7 +225,6 @@ Attr seamless(bool val) = attr("seamless", "<val>");
 Attr srcdoc(str val) = attr("srcdoc", val);
 Attr reversed(bool val) = attr("reversed", "<val>");
 Attr \start(int val) = attr("start", "<val>");
-Attr align(str val) = attr("align", val);
 Attr colspan(int val) = attr("colspan", "<val>");
 Attr rowspan(int val) = attr("rowspan", "<val>");
 Attr headers(str val) = attr("headers", val);
@@ -254,7 +253,6 @@ Attr \datetime(str val) = attr("datetime", val);
 Attr pubdate(str val) = attr("pubdate", val);
 Attr manifest(str val) = attr("manifest", val);
 
-Attr valign(str val) = attr("valign", val);
 Attr cellpadding(str val) = attr("cellpadding", val);
 Attr cellspacing(str val) = attr("cellspacing", val);
 

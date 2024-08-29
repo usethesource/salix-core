@@ -225,7 +225,6 @@ Attr seamless(bool val) = attr("seamless", "<val>");
 Attr srcdoc(str val) = attr("srcdoc", val);
 Attr reversed(bool val) = attr("reversed", "<val>");
 Attr \start(int val) = attr("start", "<val>");
-Attr align(str val) = attr("align", val);
 Attr colspan(int val) = attr("colspan", "<val>");
 Attr rowspan(int val) = attr("rowspan", "<val>");
 Attr headers(str val) = attr("headers", val);
@@ -254,7 +253,6 @@ Attr \datetime(str val) = attr("datetime", val);
 Attr pubdate(str val) = attr("pubdate", val);
 Attr manifest(str val) = attr("manifest", val);
 
-Attr valign(str val) = attr("valign", val);
 Attr cellpadding(str val) = attr("cellpadding", val);
 Attr cellspacing(str val) = attr("cellspacing", val);
 
@@ -288,7 +286,7 @@ Attr onSubmit(Msg msg) = event("submit", succeed(msg));
 Attr onBlur(Msg msg) = event("blur", succeed(msg));
 Attr onFocus(Msg msg) = event("focus", succeed(msg));
 
-Attr onCheck(Msg(bool) f) = event("change", targetChecked(f));
+Attr onCheck(Msg(bool) f) = event("check", targetChecked(f));
 
 Attr onInput(Msg(str) f) = event("input", targetValue(f)); 
 Attr onInput(Msg(int) f) = event("input", targetInt(f));
@@ -298,7 +296,7 @@ Attr onChange(Msg(int) f) = event("change", targetInt(f));
 Attr onChange(Msg(real) f) = event("change", targetReal(f));
 Attr onChange(Msg(str) f) = event("change", targetValue(f));
 
-Attr onCheck(Msg(bool) f) = event("check", targetChecked(f));
+Attr onChange(Msg(bool) f) = event("change", targetChecked(f));
   
 @doc{Smart constructors for constructing encoded event decoders.}
 Hnd succeed(Msg msg) = handler("succeed", encode(msg));

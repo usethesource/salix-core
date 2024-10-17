@@ -12,7 +12,7 @@ on:
 jobs:
   builds:
     if: ${{ !(github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[maven-release-plugin]')) }}
-    runs-on: buildjet-4vcpu-ubuntu-2204
+    runs-on: buildjet-2vcpu-ubuntu-2204
 
     steps:
       - uses: browser-actions/setup-chrome@latest

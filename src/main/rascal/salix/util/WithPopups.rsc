@@ -6,7 +6,7 @@ import salix::Core;
 import salix::Index;
 import salix::Node;
 
-import salix::demo::basic::Counter;
+// temp: import salix::demo::basic::Counter;
 
 import Node;
 import List;
@@ -123,9 +123,9 @@ void withPopupView(Popups popups, &T model, void(&T) appView, str css) {
 
 }
 
-
-App[Model] testWithCounter() 
-  = withPopupsWeb([
-    <"#thecount", popup("Pop!")>,
-    <"#header", popup("This is the header",placement=\bottom-start())>
-  ], <42>, view, "Counter"); 
+// temporary disabled
+// App[Model] testWithCounter() 
+//   = withPopupsWeb([
+//     <"#thecount", popup("Pop!")>,
+//     <"#header", popup("This is the header",placement=\bottom-start())>
+//   ], <42>, view, "Counter"); 

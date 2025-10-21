@@ -14,7 +14,7 @@ import salix::Index;
 import String;
 import util::Math;
 import Exception;
-
+import salix::util::Debug;
 
 alias Model = real;
 
@@ -33,6 +33,19 @@ App[Model] celsiusWebApp()
     ); 
 
 Model init() = 37.0;
+
+void debugCelsiusView(DebugModel[Model] m) {
+  debugView(m, view);
+}
+
+
+
+App[DebugModel[Model]] debugCelsius() 
+  = debug("celsius"
+    , Model() { return 37.0; }
+    , void(DebugModel[Model] m) { ; }
+    , Model(Msg x, Model m) { return m; }
+    , |project://salix/src/main/rascal|);
 
 void view(Model m) {   
     h2("Celsius to fahrenheit converter");

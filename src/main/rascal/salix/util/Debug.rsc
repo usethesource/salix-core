@@ -11,13 +11,16 @@ module salix::util::Debug
 import salix::HTML;
 import salix::App;
 import salix::Core;
+import salix::Index;
 
 import List;
 
 alias DebugModel[&T]
   = tuple[int current, list[&T] models, list[Msg] messages, &T(Msg, &T) update]
   ;
-  
+
+
+
 data Msg
   = next()
   | prev()
@@ -25,14 +28,20 @@ data Msg
   | goto(int version)
   ;
 
+
 App[DebugModel[&T]] debug(str appId,
                           &T() model, 
                           void(DebugModel[&T]) view, // // can't wrap view implicitly, because it'll lead to closures... 
                           &T(Msg, &T) upd,  
-                          loc static,
-                          Subs[&T] subs = noSubs)
+                          loc static)
+                          
+                          // ,
+                          // Subs[&T] subs = noSubs)
   = webApp(
-      makeApp(appId, wrapModel(model, upd), view, debugUpdate, subs = wrapSubs(subs)),  
+      makeApp(appId, wrapModel(model, upd), 
+        withIndex("Debugger", appId, view), debugUpdate
+        // , subs = wrapSubs(subs)
+        ),  
       static
     ); 
 

@@ -1,0 +1,46 @@
+TwiceModel twiceInit() = <init(), init()>;
+
+data Msg = first(Msg msg) | second(Msg msg);
+
+TwiceModel twiceUpdate(Msg msg, TwiceModel m) {
+    switch (msg) {
+        case first(Msg msg): m.fst = update(msg, m.fst);
+        case second(Msg msg): m.snd = update(msg, m.snd);
+    }
+    return m;
+}
+
+
+
+
+void twiceView(TwiceModel m) {
+    h2("Two counters");
+    ul(() {
+        li(() {
+            mapView(first, m.fst, counterView);
+        });
+        li(() {
+            mapView(second, m.snd, counterView);
+        });
+    });
+}
+
+
+
+
+
+
+
+void nView(NModel m) {
+    h2("<N> counters");
+    ul(() {
+        for (int i <- [0..N]) {
+            li(() {
+                mapView(partial(nth, i), m.ns[i], counterView);
+            });
+        }
+    });
+}
+
+
+void boxed(void() block) = div(style(("border": "solid")), block);

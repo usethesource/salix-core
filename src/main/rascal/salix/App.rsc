@@ -139,10 +139,8 @@ App[&T] webApp(SalixApp[&T] app, loc static, map[str,str] headers = ()) {
 
     if (get(/^\/salix\/<rest:.*?>\.<ext:[^.]*>$/) := req) {
       loc l = |project://salix-core/src/main/rascal/salix/<rest>.<ext>|;
-      println("l = <l>");
       if (!exists(l)) {
          l = |target://salix-core/salix/<rest>.<ext>|;
-         println("l = <l>");
          if (!exists(l)) {
             l = |lib://salix-core/salix/<rest>.<ext>|;
             if (!exists(l)) {

@@ -18,7 +18,7 @@ import List;
 import String;
 import IO;
 import lang::json::IO; // todo: typed JSON messages
-
+import Type;
 
 
 @doc{This is the basic Message data type that clients
@@ -266,6 +266,11 @@ data Sub // Subscriptions
 Sub timeEvery(Msg(int) int2msg, int interval)
   = subscription("timeEvery", encode(int2msg), args = ("interval": interval));
 
+
+
+Sub observeFile(Msg(list[FSChange]) recs2msg, str key)
+  = subscription("observeFile", encode(recs2msg), args=("key": key));
+
 alias Subs[&T] = list[Sub](&T);
 
 list[Sub] noSubs(&T _) = [];
@@ -305,6 +310,8 @@ Cmd random(Msg(int) f, int from, int to)
 Cmd setFocus(Msg() f, str id)
   = command("setFocus", encode(f), args = ("id": id));
 
+Cmd pickFile(Msg(FSHandle) f, str key)
+  = command("pickFile", encode(f), args=("key": key));
 
 /*
  * Event decoders
@@ -323,7 +330,8 @@ alias Parser = Msg(str,Handle,map[str,value]);
 @doc{Convert request parameters to a Msg value. Active mappers at `path`
 transform the message according to f.}
 Msg params2msg(map[str, value] params, Parser parse) 
-  = parse(params["type"], toHandle(params), params);
+  = parse(params["type"], toHandle(params), params)
+  when bprintln(params);
 
 @doc{Parse request parameters into a Handle.}
 Handle toHandle(map[str, value] params)
@@ -349,6 +357,35 @@ Msg parseMsg("real", Handle h, map[str,value] p)
 
 Msg parseMsg("values", Handle h, map[str,value] p)
   = applyMaps(h, decode(h, #Msg(value,value))(p["value1"], p["value2"]));
+
+// https://developer.chrome.com/blog/file-system-observer
+alias FSHandle = tuple[str kind, str name];
+alias FSChange = tuple[
+    FSHandle root, 
+    FSHandle changedHandle, 
+    list[str] relativePathComponents, 
+    str \type,
+    list[str] relativePathMovedFrom // optional
+];
+
+Msg parseMsg("fshandle", Handle h, map[str, value] p) 
+  = applyMaps(h, decode(h, #(Msg(FSHandle)))(<typeCast(#str, p["kind"]), typeCast(#str, p["name"])>));
+
+Msg parseMsg("fschange", Handle h, map[str, value] p) {
+  // todo: parse relativePathComponents and relativePathMovedFrom
+  changes = for ("object"(root=node r, \type=str t, changedHandle=node c) <- typeCast(#list[node], p["records"])) {
+      FSHandle root = <typeCast(#str, r.kind), typeCast(#str, r.name)>;
+      FSHandle changedHandle = <typeCast(#str, c.kind), typeCast(#str, c.name)>;
+      append <root, changedHandle, [], t, []>;
+  }
+  return applyMaps(h, decode(h, #(Msg(list[FSChange])))(changes));
+}
+
+
+  // = applyMaps(h, decode(h, #Msg(FSChanges)))([<
+  // > | map[str,value] rec <- p["records"]  ]);
+
+    
 
 alias XY = tuple[int x, int y];
 alias MouseXY = tuple[XY client, XY movement, XY offset, XY page, XY screen];

@@ -35,6 +35,7 @@ class Salix {
 		// queue of pending commands, events, subscription events
 		this.queue = [];
 
+		this.fileHandles = {};
 
 		// Basic library of commands and subscriptions
 		// can be extended by 'natives'.
@@ -47,17 +48,41 @@ class Salix {
 					this.handle({message: this.makeMessage(h, data)}); 
 				}, args.interval);
 				return () => clearInterval(timer);
+			},
+			observeFile: (h, args) => {
+				const obs = new FileSystemObserver((records, observer) => {
+					var lst = [];
+					for (var i = 0; i < records.length; i++) {
+						var rec = records[i];
+						var obj = {};
+						obj.changedHandle = {kind: rec.changedHandle.kind, name: rec.changedHandle.name};
+						obj.relativePathComponents = rec.relativePathComponents;
+						obj.root = {kind: rec.root.kind, name: rec.root.name};
+						obj.type = rec.type;
+						lst.push(obj);
+					}
+					var data = {type: 'fschange', records: lst};	
+					this.handle({message: this.makeMessage(h, data)});	
+				}).observe(this.fileHandles[args.key]);
+				return () => obs.disconnect();
 			}
 		};
 
 		this.Commands = {
-				random: args => {
+				pickFile: args => {
+					return window.showOpenFilePicker({multiple: false}).then(fhs => {
+						const fh = fhs[0];
+						this.fileHandles[args.key] = fh; // save to be able to observe
+						return {type: 'fshandle', kind: fh.kind, name: fh.name};	
+					});
+				},
+				random: async args => {
 					var to = args.to;
 					var from = args.from;
 					var random = Math.floor(Math.random() * (to - from + 1)) + from;
 					return {type: 'integer', value: random};
 				},
-				setFocus: args => {
+				setFocus: async args => {
 					var id = args.id;
 					document.getElementById(id).focus();
 					return {type: 'nothing'};
@@ -243,12 +268,14 @@ class Salix {
 	
 	step(payload) {
 		this.render(payload.patch);
-		this.doCommands(payload.commands);
-		this.subscribe(payload.subs);
-		// I don't understand why, but putting these in 
-		// .always on the get request doesn't work....
-		this.renderRequested = false;
-		window.requestAnimationFrame(() => this.doSome());
+		this.doCommands(payload.commands).then(() => {
+
+			this.subscribe(payload.subs);
+			// I don't understand why, but putting these in 
+			// .always on the get request doesn't work....
+			this.renderRequested = false;
+			window.requestAnimationFrame(() => this.doSome());
+		});
 	}
 	
 	render(patch) {
@@ -258,21 +285,27 @@ class Salix {
 	}
 	
 	doCommands(cmds) {
-		var prepend = [];
-		for (var i = 0; i < cmds.length; i++) {
-			var cmd = cmds[i];
-			if (cmd.none) { // legacy; let's move to list[Cmd] again...
-				continue;
-			}
-			var data = this.Commands[cmd.name](cmd.args);
+		// var prepend = [];
+		// for (var i = 0; i < cmds.length; i++) {
+		// 	var cmd = cmds[i];
+		// 	if (cmd.none) { // legacy; let's move to list[Cmd] again...
+		// 		continue;
+		// 	}
+			//var data = this.Commands[cmd.name](cmd.args);
 
-			prepend.push({message: this.makeMessage(cmd.handle, data)});
-		}
-		for (var i = prepend.length - 1; i >= 0; i--) {
-			// unshift in reverse, so that first executed command
-			// is handled first.
-			this.queue.unshift(prepend[i]);
-		}
+			var cmd = cmds[0];
+			if (cmd === undefined) {
+				return Promise.resolve(1);
+			}
+			return this.Commands[cmd.name](cmd.args).then(data => {
+				//prepend.push({message: this.makeMessage(cmd.handle, data)});
+				this.queue.unshift({message: this.makeMessage(cmd.handle, data)});
+			})
+		// for (var i = prepend.length - 1; i >= 0; i--) {
+		// 	// unshift in reverse, so that first executed command
+		// 	// is handled first.
+		// 	this.queue.unshift(prepend[i]);
+		// }
 	}
 	
 	subscribe(subs) {

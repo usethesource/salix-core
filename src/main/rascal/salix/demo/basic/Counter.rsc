@@ -12,15 +12,11 @@ import salix::App;
 import salix::HTML;
 import salix::Index;
 
-
 SalixApp[Model] counterApp(str id = "root") 
   = makeApp(id, init, withIndex("Counter", id, view), update);
 
 App[Model] counterWebApp()
-  = webApp(
-      counterApp(),
-      |project://salix/src/main/rascal|
-    );
+  = webApp(counterApp(),|project://salix-core/src/main/rascal|);
 
 
 alias Model = tuple[int count];
@@ -38,9 +34,13 @@ Model update(Msg msg, Model m) {
 }
 
 void view(Model m) {
-  h2(id("header"), "My first counter app in Rascal");
+  h2("My first counter app in Rascal");
+  counterView(m);
+}
+
+void counterView(Model m) {
   button(onClick(inc()), "+");
-  div(id("thecount"), "<m.count>");
+  span("<m.count>");
   button(onClick(dec()), "-");	
 }
 

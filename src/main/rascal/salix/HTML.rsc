@@ -142,8 +142,8 @@ void menu(value vals...) = build(vals, "menu");
  * Attributes
  */
  
-Attr style(tuple[str, str] styles...) = attr("style", intercalate("; ", ["<k>: <v>" | <k, v> <- styles ])); 
-Attr style(map[str,str] styles) = attr("style", intercalate("; ", ["<k>: <styles[k]>" | k <- styles ])); 
+Attr style(tuple[str, value] styles...) = attr("style", intercalate("; ", ["<k>: <v>" | <k, v> <- styles ])); 
+Attr style(map[str,value] styles) = attr("style", intercalate("; ", ["<k>: <styles[k]>" | k <- styles ])); 
 
 Attr crossorigin(str val) = attr("crossorigin", val);
 Attr integrity(str val) = attr("integrity", val);

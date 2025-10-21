@@ -9,6 +9,7 @@
 module salix::Diff
 
 import salix::Node;
+import salix::util::LCS;
 import List;
 import util::Math;
 import IO;
@@ -27,7 +28,7 @@ data Patch
   ;
 
 data EditType
-  = setText() | replace() | removeNode() | appendNode()
+  = setText() | replace() | removeNode() | appendNode() | insertNode()
   | setAttr() | setProp() | setEvent() | setExtra()
   | removeAttr() | removeProp() | removeEvent() | removeExtra()
   ;
@@ -37,7 +38,7 @@ data Hnd = null();
 
 data Edit
   = edit(EditType \type, str contents="", Node html=none(), Hnd handler=null(),
-        str name="", str val="", value extra=());
+        str name="", str val="", int pos=-1, value extra=());
 
 // nodes at this level are always assumed to be <html> nodes,
 // however, we only diff their bodies. This is (unfortunately)
@@ -54,7 +55,68 @@ Patch diff(Node old, Node new) {
   return p;
 } 
 
+bool nodeEq(Node x, Node y) {
+  if (x.\type != y.\type) {
+    return false;
+  }
+
+  if (x.\type is element) {
+    if (x.tagName == y.tagName) {
+      return true;
+    }
+  }
+  
+  if (x.\type is txt) {
+    if (x.contents == y.contents) {
+      return true;
+    }
+  }
+  return false;
+}
+
 Patch diff(Node old, Node new, int idx) {
+  //println("diffing: <old> against <new>");
+
+  // Patch p = patch(idx);
+
+  // if (!nodeEq(old, new)) {
+  //   p.edits=[edit(replace(), html=new)];
+  //   return p;
+  // }
+
+  // // they're nodeEq now, so if one of them is element, the other is too
+  // if (old.\type is element) {
+  //   p.edits = diffMap(old.attrs, new.attrs, setAttr(), removeAttr())
+  //     + diffMap(old.props, new.props, setProp(), removeProp())  
+  //     + diffEventMap(old.events, new.events)
+  //     + diffExtra(old.extra, new.extra);
+  // }
+
+  // list[Node] oldKids = old.kids;
+  // list[Node] newKids = new.kids;
+  // LCSMatrix mx = lcsMatrix(oldKids, newKids, nodeEq);
+  // list[Diff[Node]] d = getDiff(mx, oldKids, newKids, size(oldKids), size(newKids), nodeEq);
+
+  // iprintln(d);
+
+  // for (int i <- [0..size(d)]) {
+  //   switch (d[i]) {
+  //     case same(Node n1, Node n2): {
+  //       Patch p2 = diff(n1, n2, i);
+  //       if (p2.patches != [] || p2.edits != []) {
+  //         p.patches += [p2];
+  //       }
+  //     }
+  //     case add(Node n, int pos):
+  //       p.edits += [edit(insertNode(), html=n, pos=pos)];
+  //     case remove(Node _, int pos):
+  //       p.edits += [edit(removeNode(), pos=pos)];
+  //   }
+  // }
+
+  // return p;
+
+
   if (old.\type is empty) {
     return patch(idx, edits = [edit(replace(), html=new)]);
   }
@@ -69,16 +131,7 @@ Patch diff(Node old, Node new, int idx) {
     }
     return patch(idx);
   }
-  
-  // if (old.\type is native, new.\type is native) {
-  //   edits = diffMap(old.props, new.props, setProp(), removeProp())
-  //     + diffMap(old.attrs, new.attrs, setAttr(), removeAttr())
-  //     + diffEventMap(old.events, new.events);
-  //   if (old.id != new.id) {
-  //     edits += edit(setProp(), name="id", val=new.id);
-  //   }
-  //   return patch(idx, edits = edits);  
-  // }
+
   
   if (old.\type is element, old.tagName != new.tagName) {
     return patch(idx, edits = [edit(replace(), html=new)]);
@@ -93,14 +146,45 @@ Patch diff(Node old, Node new, int idx) {
   return diffKids(old.kids, new.kids, patch(idx, edits = edits));
 }
 
+bool isAlien(Node nk) = nk.\type is element
+  && nk.tagName == "div"
+  && "class" in nk.attrs
+  && nk.attrs["class"] == "salix-alien";
+
+str getId(Node n) = n.attrs["id"];
+
 Patch diffKids(list[Node] oldKids, list[Node] newKids, Patch myPatch) {
   oldLen = size(oldKids);
   newLen = size(newKids);
   
   for (int i <- [0..min(oldLen, newLen)]) {
-    Patch p = diff(oldKids[i], newKids[i], i);
-    if (p.edits != [] || p.patches != []) {
-      myPatch.patches += [p];
+    Node ok = oldKids[i];
+    Node nk = newKids[i];
+
+
+    // aliens are not robust to diffing their internals
+    // so if an existing alien moves or a new alien is created
+    // we don't patch it but (re)build it from scratch;
+    // this only happens if newKid is an alien
+    // and oldKid is not. (the reverse case is not important:
+    // in this case the the old alien would be "destroyed"
+    // by patching it into the new (non-alien) node).
+    // if both old and new are alien *and* have the same 
+    // the custom patch algorithm handles the things
+    // (covered by the else branch below).
+
+    if (!isAlien(ok), isAlien(nk)) {
+      myPatch.patches += [patch(i, edits=[edit(replace(), html=nk)])];
+    }
+    // else if (isAlien(ok), isAlien(nk), getId(ok) != getId(nk)) {
+    //   myPatch.patches += [patch(i, edits=[edit(replace(), html=nk)])];
+    // }
+    else {
+      Patch p = diff(oldKids[i], newKids[i], i);
+
+      if (p.edits != [] || p.patches != []) {
+        myPatch.patches += [p];
+      }
     }
   }
   

@@ -38,7 +38,7 @@ data Msg
   ;
 
 SalixApp[AllModel] allDemosApp(str id = "root") 
-  = makeApp(id, initAll, withIndex("All", id, viewAll), editAll
+  = makeApp(id, initAll, withIndex("All", id, viewAll), updateAll
            , subs = allSubs, parser = parseMsg);
        
        
@@ -63,7 +63,20 @@ list[Sub] allSubs(AllModel m)
 void myDebugView(DebugModel[AllModel] m) {
   debugView(m, viewAll);
 }
-  
+
+void bla() {
+  updateAll(celsius(c("32.0")), initAll());
+}
+
+
+App[DebugModel[AllModel]] debugAll()
+  = debug("debugAll"
+      , salix::demo::basic::All::initAll
+      , salix::demo::basic::All::myDebugView
+      , updateAll
+      , |project://salix/src/main/rascal|);
+    //, subs = salix::demo::basic::All::allSubs);
+
 void viewAll(AllModel m) {
   mapView(Msg::celsius, m.celsius, salix::demo::basic::Celsius::view);
   mapView(Msg::counter, m.counter, salix::demo::basic::Counter::view);
@@ -71,7 +84,8 @@ void viewAll(AllModel m) {
   mapView(Msg::clock, m.clock, salix::demo::basic::Clock::view);
 }
 
-AllModel editAll(Msg msg, AllModel m) {
+
+AllModel updateAll(Msg msg, AllModel m) {
   
   switch (msg) {
     case celsius(Msg msg):

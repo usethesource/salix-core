@@ -20,6 +20,7 @@ data Msg;
 void text(value v) = _text(v);
 
 
+
 @doc{The element render functions below all call build
 to interpret the list of values; build will call the
 second argument (_h1 etc.) to construct the actual
@@ -184,7 +185,7 @@ Attr multiple(bool val) = val ? attr("multiple", "<val>") : null();
 Attr name(str val) = attr("name", val);
 Attr novalidate(bool val) = attr("novalidate", "<val>");
 Attr pattern(str val) = attr("pattern", val);
-Attr readonly(bool val) = attr("readonly", "<val>");
+Attr readonly(bool val) = val ? attr("readonly", "<val>") : null();
 Attr required(bool val) = attr("required", "<val>");
 Attr size(int val) = attr("size", "<val>");
 Attr \for(str val) = attr("for", val);

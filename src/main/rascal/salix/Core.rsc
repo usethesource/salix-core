@@ -330,8 +330,8 @@ alias Parser = Msg(str,Handle,map[str,value]);
 @doc{Convert request parameters to a Msg value. Active mappers at `path`
 transform the message according to f.}
 Msg params2msg(map[str, value] params, Parser parse) 
-  = parse(params["type"], toHandle(params), params)
-  when bprintln(params);
+  = parse(params["type"], toHandle(params), params);
+  //when bprintln(params);
 
 @doc{Parse request parameters into a Handle.}
 Handle toHandle(map[str, value] params)

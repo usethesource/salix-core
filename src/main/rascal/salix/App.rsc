@@ -107,9 +107,9 @@ SalixApp[&T] makeApp(str appId, &T() init, void(&T) view, &T(Msg, &T) update,
       case message(map[str,value] params): {
         Msg msg = params2msg(params, parser);
         
-        //if (debug) {
+        if (debug) {
           println("Processing: <appId>/<msg>");
-        //}
+        }
         
         <cmds, newModel> = execute(msg, update, currentModel.val);
         resp = transition(cmds, newModel);
@@ -138,27 +138,18 @@ App[&T] webApp(SalixApp[&T] app, loc static, map[str,str] headers = ()) {
     } 
 
     if (get(/^\/salix\/<rest:.*?>\.<ext:[^.]*>$/) := req) {
-      loc l = |project://salix-core/src/main/rascal/salix/<rest>.<ext>|;
-      if (!exists(l)) {
-         l = |target://salix-core/salix/<rest>.<ext>|;
-         if (!exists(l)) {
-            l = |lib://salix-core/salix/<rest>.<ext>|;
-            if (!exists(l)) {
-               println("WARNING: could not find <l>");
-               return response("Could not find: <l>");
-            }
-         }
+      try {
+        loc resource = getResource("salix/<rest>.<ext>");
+        return fileResponse(resource, mimeTypes[ext], headers);
       }
-      println("Responding with salix asset: <l>");
-      return fileResponse(l, mimeTypes[ext], headers);
+      catch IO(str msg) : {
+        return response(notFound(), msg);
+      }
     }
 
     if (get(p:/\.<ext:[^.]*>$/) := req) {
       return fileResponse(static[path="<static.path>/<p>"], mimeTypes[ext], headers);
     }
-    
-    list[str] path = split("/", req.path);
-    
     
     if (get("/<app.id>/init") := req) {
       return respondHttp(app.rr(begin()));

@@ -137,14 +137,13 @@ App[&T] webApp(SalixApp[&T] app, loc static, map[str,str] headers = ()) {
       return response(toHtml(doc.doc));
     } 
 
-    if (get(/^\/salix\/<rest:.*?>\.<ext:[^.]*>$/) := req) {
-      try {
-        loc resource = getResource("salix/<rest>.<ext>");
+    try {
+      if (get(/^\/salix\/<rest:.*?>\.<ext:[^.]*>$/) := req, loc resource <- findResources("salix/<rest>.<ext>")) {
         return fileResponse(resource, mimeTypes[ext], headers);
       }
-      catch IO(str msg) : {
-        return response(notFound(), msg);
-      }
+    }
+    catch IO(str msg) : {
+      return response(notFound(), msg);
     }
 
     if (get(p:/\.<ext:[^.]*>$/) := req) {

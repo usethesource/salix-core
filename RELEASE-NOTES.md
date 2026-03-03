@@ -1,4 +1,9 @@
-## 0.2.4
+## 0.2.11
+
+* salix-core did not work properly as a library dependency anymore. This was fixed.
+* fewer debug println's
+
+## 0.2.10
 
 * started on file watch feature from within the browser
 

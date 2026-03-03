@@ -1,3 +1,6 @@
+## 0.2.4
+
+* started on file watch feature from within the browser
 
 ## 0.2.3
 

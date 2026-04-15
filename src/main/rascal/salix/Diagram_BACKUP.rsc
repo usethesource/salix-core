@@ -1,4 +1,4 @@
-module salix::Diagram
+module salix::Diagram_BACKUP
 
 import salix::HTML;
 import salix::SVG;

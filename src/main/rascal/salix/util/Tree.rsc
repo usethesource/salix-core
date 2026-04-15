@@ -111,7 +111,7 @@ public str TREE_CSS = "
 '
 '.tree summary::before {
 '  z-index: 1;
-'  background: #696 url(\'expand-collapse.svg\') 0 0;
+'  background: #696 url(\'/salix/util/expand-collapse.svg\') 0 0;
 '}
 '
 '.tree details[open] \> summary::before {

@@ -125,6 +125,8 @@ SalixApp[&T] makeApp(str appId, &T() init, void(&T) view, &T(Msg, &T) update,
   return <appId, reply>;
 }
 
+map[str, str] myMimeTypes = mimeTypes + ("svg": "image/svg+xml");
+
 @doc{Turn a single Salix App into a web application. The index parameter should point to the local file which holds the index html.
 The static parameter should point to the base directory from where static files should be served}
 App[&T] webApp(SalixApp[&T] app, loc static, map[str,str] headers = ()) {
@@ -139,7 +141,7 @@ App[&T] webApp(SalixApp[&T] app, loc static, map[str,str] headers = ()) {
 
     try {
       if (get(/^\/salix\/<rest:.*?>\.<ext:[^.]*>$/) := req, loc resource <- findResources("salix/<rest>.<ext>")) {
-        return fileResponse(resource, mimeTypes[ext], headers);
+        return fileResponse(resource, myMimeTypes[ext], headers);
       }
     }
     catch IO(str msg) : {
@@ -147,7 +149,7 @@ App[&T] webApp(SalixApp[&T] app, loc static, map[str,str] headers = ()) {
     }
 
     if (get(p:/\.<ext:[^.]*>$/) := req) {
-      return fileResponse(static[path="<static.path>/<p>"], mimeTypes[ext], headers);
+      return fileResponse(static[path="<static.path>/<p>"], myMimeTypes[ext], headers);
     }
     
     if (get("/<app.id>/init") := req) {

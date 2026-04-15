@@ -5,9 +5,10 @@ import salix::util::Tree;
 import salix::App;
 import salix::Index;
 import salix::HTML;
+
 import Set;
 import List;
-
+import String;
 import util::FileSystem;
 
 SalixApp[Model] treesApp(str id = "root") 
@@ -43,7 +44,7 @@ void view(Model m) {
 
     h2("Filesystem");
     FileSystem fs = crawl(|cwd:///src/main/rascal|);
-    nodeTree(fs, str(FileSystem f) { return f.l.path; },
+    nodeTree(fs, str(FileSystem f) { return split("/", f.l.path)[-1]; },
         list[value](FileSystem f) { 
             return f is directory ? sort(f.children) : []; });
 }

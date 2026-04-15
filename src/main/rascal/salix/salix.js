@@ -59,7 +59,7 @@ class Salix {
 						obj.relativePathComponents = rec.relativePathComponents;
 						obj.root = {kind: rec.root.kind, name: rec.root.name};
 						obj.type = rec.type;
-						lst.push(obj);
+						lst.unshift(obj);
 					}
 					var data = {type: 'fschange', records: lst};	
 					this.handle({message: this.makeMessage(h, data)});	
@@ -131,6 +131,13 @@ class Salix {
 
 			jsonPayload: function (args) {
 				return function (obj) { return {type: 'json', payload: obj}; };
+			},
+
+			formData: function (args) {
+				return function (obj) {
+					const data = new FormData(obj.target);
+					return {type: 'formData', payload: JSON.stringify(Object.fromEntries(data))};
+				};
 			},
 			
 			keyCode: function (args) {
@@ -556,7 +563,7 @@ class Salix {
 	    var vprops = vdom.props || {};
 	    var vevents = vdom.events || {};
 
-	    var elt = vprops.namespace != undefined
+	    var elt = vprops.namespace !== undefined
 	            ? document.createElementNS(vprops.namespace, vdom.tagName)
 	            : document.createElement(vdom.tagName);
 	    

@@ -20,7 +20,6 @@ import IO;
 import lang::json::IO; // todo: typed JSON messages
 import Type;
 
-
 @doc{This is the basic Message data type that clients
 will extend with concrete constructors.
 
@@ -210,7 +209,7 @@ void withExtra(map[str, value] stuff, void() block) {
 
 @doc{The basic build function to construct html elements on the stack.
 The list of argument values can contain any number of Attr values.
-The last argument (if any) can be a blouitck, an Node node, or a value.
+The last argument (if any) can be a block, a Node node, or a value.
 In the latter case it is converted to a txt node.}
 void build(list[value] vals, str tagName) {
   map[str, value] myExtra = ();
@@ -331,7 +330,6 @@ alias Parser = Msg(str,Handle,map[str,value]);
 transform the message according to f.}
 Msg params2msg(map[str, value] params, Parser parse) 
   = parse(params["type"], toHandle(params), params);
-  //when bprintln(params);
 
 @doc{Parse request parameters into a Handle.}
 Handle toHandle(map[str, value] params)
@@ -410,6 +408,12 @@ Msg parseMsg("json", Handle h, map[str, value] p)
   = applyMaps(h, decode(h, t)(p))
   when type[Msg(map[str,value])] t := #Msg(map[str,value]);
 
+
+Msg parseMsg("formData", Handle h, map[str, value] p)
+  = applyMaps(h, decode(h, t)(parseJSON(#map[str,value], pl)))
+  when 
+    type[Msg(map[str,value])] t := #Msg(map[str,value]),
+    str pl := p["payload"]; // work-around on dispatch bug with java functions
 
 Msg applyMaps(Handle h, Msg msg) = ( msg | decode(m, #(Msg(Msg)))(it) | int m <- h.maps );
 

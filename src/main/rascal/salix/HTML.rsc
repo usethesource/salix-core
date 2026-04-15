@@ -20,7 +20,6 @@ data Msg;
 void text(value v) = _text(v);
 
 
-
 @doc{The element render functions below all call build
 to interpret the list of values; build will call the
 second argument (_h1 etc.) to construct the actual
@@ -283,7 +282,7 @@ Attr onMouseOverXY(Msg(MouseXY) f) = event("mouseover", mouseXY(f));
 Attr onMouseOutXY(Msg(MouseXY) f) = event("mouseout", mouseXY(f));
 
 
-Attr onSubmit(Msg msg) = event("submit", succeed(msg));
+Attr onSubmit(Msg(map[str,value]) json2msg) = event("submit", formData(json2msg));
 Attr onBlur(Msg msg) = event("blur", succeed(msg));
 Attr onFocus(Msg msg) = event("focus", succeed(msg));
 
@@ -315,4 +314,6 @@ Hnd targetReal(Msg(real) real2msg) = handler("targetReal", encode(real2msg));
 Hnd mouseXY(Msg(MouseXY) xy2msg) = handler("mouseXY", encode(xy2msg));
 
 Hnd jsonPayload(Msg(map[str,value]) json2msg) = handler("jsonPayload", encode(json2msg));
+
+Hnd formData(Msg(map[str,value]) json2msg) = handler("formData", encode(json2msg));
 

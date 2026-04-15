@@ -5,6 +5,7 @@ import salix::HTML;
 import salix::Index;
 import salix::Core;
 
+
 import util::Maybe;
 import IO;
 
@@ -17,14 +18,16 @@ App[Model] filesWebApp()
 
 list[Sub] subs(Model m) = [observeFile(fileChange, "it") | just(FSHandle fh) := m.theFile ];
 
-alias Model = tuple[Maybe[FSHandle] theFile, list[list[FSChange]] changes];
+alias Model = tuple[Maybe[FSHandle] theFile, list[list[FSChange]] changes, str selectedPath];
 
-Model init() = <nothing(), []>;
+Model init() = <nothing(), [], "">;
 
 data Msg 
     = fileOpened(FSHandle fh)
     | fileChange(list[FSChange] changes)
     | openFile()
+    | fileSelected(str path)
+    | submitted(map[str, value] formData)
     ;
 
 Model update(Msg msg, Model m) {
@@ -36,6 +39,10 @@ Model update(Msg msg, Model m) {
     } 
     case fileChange(list[FSChange] cs):
         m.changes += [cs];
+    case fileSelected(str path):
+        m.selectedPath = path;
+    case submitted(map[str, value] formData):
+        iprintln(formData);
   }
   return m;
 }
@@ -49,6 +56,24 @@ void view(Model m) {
     for (list[FSChange] cs <- m.changes) {
         li("<cs>");
     }
+  });
+
+  h2("Normal file inputs");
+
+  input(\type("file"), onChange(fileSelected));
+
+  div("<m.selectedPath>");
+
+
+  form(onSubmit(submitted), () {
+    p("Select file:");
+    input(\type("file"), name("file"));
+    br();
+    input(\type("text"), name("something"));
+    br();
+    input(\type("number"), name("anumber"));
+    br();
+    input(\type("submit"));
   });
 
 }

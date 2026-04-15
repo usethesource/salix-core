@@ -1,6 +1,0 @@
-
-Hello world of async file watching 
-in the browser.
-
-See that?
-

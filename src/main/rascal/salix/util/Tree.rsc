@@ -11,7 +11,7 @@ void tree(void() block) {
 
 Attr open(bool val) = val ? attr("open", "<val>") : null();
 
-void subtree(str label, bool flag, void() block) {
+void subTree(str label, bool flag, void() block) {
     li(() {
         details(open(flag), () {
             summary(label);
@@ -22,25 +22,7 @@ void subtree(str label, bool flag, void() block) {
 
 void leaf(value vals...) = li(vals);
 
-void nodeTree(node n, str(node) getLabel, list[value](node) getKids) {
-    tree(() {
-        nodeTree_(n, getLabel, getKids);
-    });
-}
-
-default void nodeTree_(value v, str(node) _, list[value](node) _) {
-    //leaf(v);
-}
-
-void nodeTree_(node n, str(node) getLabel, list[value](node) getKids) {
-    subtree(getLabel(n), true /* todo? */, () {
-        for (value k <- getKids(n)) {
-            nodeTree_(k, getLabel, getKids);
-        }
-    });
-}
-
-// https://iamkate.com/code/tree-views/
+// taken from: https://iamkate.com/code/tree-views/
 public str TREE_CSS = "
 '.tree {
 '  --spacing: 1.5rem;

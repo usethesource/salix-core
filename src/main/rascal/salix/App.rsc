@@ -36,6 +36,7 @@ data SalixRequest
 data SalixResponse
   = next(list[Cmd] cmds, list[Sub] subs, Patch patch)
   | document(Node doc)
+  | noop()
   ;
   
 @doc{A function type to describe a basic SalixApp without committing to a 
@@ -78,7 +79,7 @@ SalixApp[&T] makeApp(str appId, &T() init, void(&T) view, &T(Msg, &T) update,
     // without polluting user-space code with non-compositional ids.
     switchTo(appId); // Note also switchFrom after every handling of a request.
     
-    SalixResponse resp;
+    SalixResponse resp = noop();
     
     switch (req) {
       

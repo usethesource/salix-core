@@ -132,7 +132,9 @@ private &U _decode(int funcId, type[&U] _) = d
   when
     &U d := state.from[funcId];
     
-private default &U _decode(int funcId, type[&U] _) { throw "No corresponding function found with `<funcId> (<state>)`"; }
+private default &U _decode(int funcId, type[&U] t) { 
+  throw "No corresponding function found with <funcId> and type <t>\n(<state>)"; 
+}
 
 @doc{The stack of active msg transformers at some point during rendering.}
 private list[Msg(Msg)] mappers = [];

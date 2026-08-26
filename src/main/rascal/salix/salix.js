@@ -90,6 +90,27 @@ class Salix {
 		};
 
 		this.Decoders = {
+			preventDefault: function (args) {
+				return function (e) { 
+					e.preventDefault(); 
+					return {type: 'nothing'}; 
+				};
+			},
+			
+			transferId: function (args) {
+				return function (e) { 
+					e.dataTransfer.setData('text/plain', e.target.id);
+					return {type: 'nothing'};
+				};
+			},
+
+			transferredData: function (args) {
+				return function (e) {
+					e.preventDefault();
+					return {type: 'string', value: e.dataTransfer.getData("text/plain")};
+				};
+			},
+
 			succeed: function (args) {
 				return function (e) { return {type: 'nothing'}; };
 			},

@@ -263,6 +263,11 @@ Attr cellspacing(str val) = attr("cellspacing", val);
 Attr onKeyPress(Msg(int) msg) = event("keypress", keyCode(msg));
 Attr onKeyDown(Msg(int) msg) = event("keydown", keyCode(msg));
 
+// onDragStart defaults to e.dataTransfer.setData(e.target.id)
+Attr onDragStart(Msg msg) = event("dragstart", tranferId(msg));
+Attr onDragOver(Msg msg) = event("dragover", preventDefault(msg));
+Attr onDrop(Msg(str) f) = event("drop", transferredData(f)); 
+
 Attr onClick(Msg msg) = event("click", succeed(msg));
 Attr onDoubleClick(Msg msg) = event("dblclick", succeed(msg));
 Attr onMouseDown(Msg msg) = event("mousedown", succeed(msg));
@@ -317,3 +322,9 @@ Hnd jsonPayload(Msg(map[str,value]) json2msg) = handler("jsonPayload", encode(js
 
 Hnd formData(Msg(map[str,value]) json2msg) = handler("formData", encode(json2msg));
 
+
+Hnd preventDefault(Msg msg) = handler("preventDefault", encode(msg));
+
+Hnd tranferId(Msg msg) = handler("transferId", encode(msg));
+
+Hnd transferredData(Msg(str) str2msg) = handler("transferredData", encode(str2msg));

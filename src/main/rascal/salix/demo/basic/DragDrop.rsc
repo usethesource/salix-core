@@ -27,12 +27,13 @@ Model init() = <-1>;
 data Msg 
     = beingDragged(str id)
     | dropped(int zone, str id)
-    | draggingOver()
+    | draggingOver(int zone)
     ;
 
 Model update(Msg msg, Model m) {
   switch (msg) {
     case beingDragged(str x): println("being dragged: <x>");
+    case draggingOver(int zone): println("entering zone: <zone>");
     case dropped(int zone, str x): {
         println("this was dropped: <x> at <zone>");
         m.zone = zone;
@@ -46,7 +47,9 @@ void draggableDiv(str x, void() block) {
 }
 
 void droppableDiv(int x, void() block) {
-    div(style(("border": "solid")), onDragOver(draggingOver()), onDrop(partial(dropped, x)), block);
+    Msg(str) f = partial(dropped, x); // workaround: inlining f breaks the typechecker
+
+    div(style(("border": "solid")), onDragOver(draggingOver(x)), onDrop(f), block);
 }
 
 void view(Model m) {

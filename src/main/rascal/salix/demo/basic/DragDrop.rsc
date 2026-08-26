@@ -10,6 +10,7 @@ module salix::demo::basic::DragDrop
 import salix::App;
 import salix::HTML;
 import salix::Index;
+import salix::Core;
 import IO;
 
 SalixApp[Model] dragDropApp(str id = "root") 
@@ -19,33 +20,50 @@ App[Model] dragDropWebApp()
   = webApp(dragDropApp(),|project://salix-core/src/main/rascal|);
 
 
-alias Model = tuple[int count];
+alias Model = tuple[int zone];
 
-Model init() = <0>;
+Model init() = <-1>;
 
 data Msg 
-    = beingDragged()
-    | dropped(str id)
+    = beingDragged(str id)
+    | dropped(int zone, str id)
     | draggingOver()
     ;
 
 Model update(Msg msg, Model m) {
   switch (msg) {
-    case beingDragged(): println("being dragged");
-    case dropped(str x): println("this was dropped: <x>");
+    case beingDragged(str x): println("being dragged: <x>");
+    case dropped(int zone, str x): {
+        println("this was dropped: <x> at <zone>");
+        m.zone = zone;
+    }
   }
   return m;
 }
 
-void view(Model m) {
-  h2("My first drag and drop");
-  
-  div(draggable("true"), onDragStart(beingDragged()), id("thing"), () {
-    p("this is draggable");
-  });
+void draggableDiv(str x, void() block) {
+    div(draggable("true"), onDragStart(beingDragged(x)),id(x), block);
+}
 
-  div(style(("border": "solid")), onDragOver(draggingOver()), onDrop(dropped), () {
-    p("drop zone");
-  });
+void droppableDiv(int x, void() block) {
+    div(style(("border": "solid")), onDragOver(draggingOver()), onDrop(partial(dropped, x)), block);
+}
+
+void view(Model m) {
+    h2("My first drag and drop");
+  
+    draggableDiv("thing", () {
+        p("this is draggable");
+    });
+
+
+    for (int i <- [1..4]) {
+        droppableDiv(i, () {
+            p("drop zone <i>");
+            if (m.zone == i) {
+                p("the thing is here");
+            }
+        });
+    };
 }
 

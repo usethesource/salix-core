@@ -258,7 +258,7 @@ void _text(value v) {
  */
 
  
-@doc{Subs are like events: they are sent to JS, and messages are sent back.}
+@doc{Subs are like events: they are sent by JS, and messages are sent back.}
 data Sub // Subscriptions
   = subscription(str name, Handle handle, map[str, value] args = ())
   ;
@@ -267,10 +267,11 @@ data Sub // Subscriptions
 Sub timeEvery(Msg(int) int2msg, int interval)
   = subscription("timeEvery", encode(int2msg), args = ("interval": interval));
 
-
-
 Sub observeFile(Msg(list[FSChange]) recs2msg, str key)
   = subscription("observeFile", encode(recs2msg), args=("key": key));
+
+Sub observeResize(Msg(Resize) res2msg, str id)
+  = subscription("observeResize", encode(res2msg), args=("id": id));
 
 alias Subs[&T] = list[Sub](&T);
 
@@ -385,7 +386,14 @@ Msg parseMsg("fschange", Handle h, map[str, value] p) {
   // = applyMaps(h, decode(h, #Msg(FSChanges)))([<
   // > | map[str,value] rec <- p["records"]  ]);
 
-    
+
+alias Resize = tuple[num inline, num block];
+
+Msg parseMsg("Resize", Handle h, map[str, value] p)
+  = applyMaps(h, decode(h, #(Msg(Resize)))(<inline, block>))
+  when 
+    num inline := p["inline"],
+    num block := p["block"];
 
 alias XY = tuple[int x, int y];
 alias MouseXY = tuple[XY client, XY movement, XY offset, XY page, XY screen];

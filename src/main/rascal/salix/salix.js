@@ -49,6 +49,19 @@ class Salix {
 				}, args.interval);
 				return () => clearInterval(timer);
 			},
+			observeResize: (h, args) => {
+				const obs = new ResizeObserver((entries) => {
+					for (const entry of entries) {
+						var box = entry.contentBoxSize[0];
+						var data = {type: 'Resize', inline: box.inlineSize, block: box.blockSize};
+						this.handle({message: this.makeMessage(h, data)});
+						break; // only support one
+					}
+				});
+				const elem = document.getElementById(args.id);
+				obs.observe(elem);
+				return () => obs.disconnect();
+			},
 			observeFile: (h, args) => {
 				const obs = new FileSystemObserver((records, observer) => {
 					var lst = [];
@@ -366,7 +379,7 @@ class Salix {
 		}
 		for (var i = 0; i < toDelete.length; i++) {
 			this.subscriptions[toDelete[i]](); // shutdown
-			delete subscriptions[toDelete[i]];
+			delete this.subscriptions[toDelete[i]];
 		}
 	}
 

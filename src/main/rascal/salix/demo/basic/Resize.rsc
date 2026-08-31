@@ -16,7 +16,7 @@ import IO;
 App[Model] resizeWebApp() = webApp(resizeApp(), |project://salix/src/main/rascal|);
 
 SalixApp[Model] resizeApp(str id = "root") 
-  = makeApp(id, init, withIndex("Clock", id, view), update, subs=subs);
+  = makeApp(id, init, withIndex("Resizable demo", id, view), update, subs=subs);
 
 alias Model = tuple[bool resizable];
 

@@ -42,31 +42,21 @@ Model update(Msg msg, Model m) {
   return m;
 }
 
-void draggableDiv(str x, void() block) {
-    div(draggable("true"), onDragStart(beingDragged(x)),id(x), block);
-}
-
-void droppableDiv(int x, void() block) {
-    Msg(str) f = partial(dropped, x); // workaround: inlining f breaks the typechecker
-
-    div(style(("border": "solid")), onDragOver(draggingOver(x)), onDrop(f), block);
-}
-
 void view(Model m) {
     h2("My first drag and drop");
-  
-    draggableDiv("thing", () {
+
+    div(onDrag("thing", beingDragged), () {
         p("this is draggable");
     });
-
-
+  
     for (int i <- [1..4]) {
-        droppableDiv(i, () {
+        Msg(str) f = partial(dropped, i);
+        div(style(("border": "solid")), onDrop(draggingOver(i), f), () {
             p("drop zone <i>");
             if (m.zone == i) {
                 p("the thing is here");
             }
         });
-    };
+    }
 }
 

@@ -229,14 +229,15 @@ void build(list[value] vals, str tagName) {
     else if (Node h := vals[-1]) { // a computed node is simply added
       add(h);
     }
-    else if (Attr _ !:= vals[-1]) { // else (if not Attr), render as text.
+    else if (Attr _ !:= vals[-1], list[Attr] _ !:= vals[-1]) { 
+        // else (if not Attr or list[Attr]), render as text.
       _text(vals[-1]);
     }
   }
 
   // construct the `elt` using the kids at the top of the stack
   // and any attributes in vals and add it to the parent's list of children.
-  list[Attr] as = [ a | Attr a <- vals ];
+  list[Attr] as = [ a | Attr a <- vals ] + [ *as | list[Attr] as <- vals ];
   Node theNode = hnode(element(), tagName=tagName, kids=pop(), attrs=attrsOf(as), props=propsOf(as), events=eventsOf(as));
   if (myExtra != ()) {
     theNode.extra = myExtra;

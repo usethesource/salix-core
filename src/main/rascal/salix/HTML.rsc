@@ -268,6 +268,14 @@ Attr onDragStart(Msg msg) = event("dragstart", tranferId(msg));
 Attr onDragOver(Msg msg) = event("dragover", preventDefault(msg));
 Attr onDrop(Msg(str) f) = event("drop", transferredData(f)); 
 
+// smart(er) constructors (will be spliced during render)
+list[Attr] onDrag(str id_, Msg(str) m)
+    = [draggable("true"), onDragStart(m(id_)), id(id_)];
+
+list[Attr] onDrop(Msg over, Msg(str) dropped)
+    = [onDragOver(over), onDrop(dropped)];
+
+
 Attr onClick(Msg msg) = event("click", succeed(msg));
 Attr onDoubleClick(Msg msg) = event("dblclick", succeed(msg));
 Attr onMouseDown(Msg msg) = event("mousedown", succeed(msg));

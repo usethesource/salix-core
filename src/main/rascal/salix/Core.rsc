@@ -387,10 +387,17 @@ Msg parseMsg("fschange", Handle h, map[str, value] p) {
   // = applyMaps(h, decode(h, #Msg(FSChanges)))([<
   // > | map[str,value] rec <- p["records"]  ]);
 
+alias DropXY = tuple[str id, num clientX, num clientY];
+
+Msg parseMsg("dropXY", Handle h, map[str,value] p)
+  = applyMaps(h, decode(h, #(Msg(DropXY)))(<p["value"], clientX, clientY>))
+  when 
+    num clientX := p["clientX"], num clientY := p["clientY"];
+
 
 alias Resize = tuple[num inline, num block];
 
-Msg parseMsg("Resize", Handle h, map[str, value] p)
+Msg parseMsg("resize", Handle h, map[str, value] p)
   = applyMaps(h, decode(h, #(Msg(Resize)))(<inline, block>))
   when 
     num inline := p["inline"],

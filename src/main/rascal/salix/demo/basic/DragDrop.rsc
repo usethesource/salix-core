@@ -26,16 +26,18 @@ Model init() = <-1>;
 
 data Msg 
     = beingDragged(str id)
-    | dropped(int zone, str id)
+    | dropped(int zone, DropXY dxy)
     | draggingOver(int zone)
     ;
+
 
 Model update(Msg msg, Model m) {
   switch (msg) {
     case beingDragged(str x): println("being dragged: <x>");
     case draggingOver(int zone): println("entering zone: <zone>");
-    case dropped(int zone, str x): {
-        println("this was dropped: <x> at <zone>");
+    case dropped(int zone, DropXY dxy): {
+        println("this was dropped: <dxy.id> at <zone>");
+        println("at x=<dxy.clientX>, y=<dxy.clientY>");
         m.zone = zone;
     }
   }
@@ -50,7 +52,7 @@ void view(Model m) {
     });
   
     for (int i <- [1..4]) {
-        Msg(str) f = partial(dropped, i);
+        Msg(DropXY) f = partial(dropped, i);
         div(style(("border": "solid")), onDrop(draggingOver(i), f), () {
             p("drop zone <i>");
             if (m.zone == i) {

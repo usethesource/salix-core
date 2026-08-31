@@ -267,6 +267,8 @@ Attr onKeyDown(Msg(int) msg) = event("keydown", keyCode(msg));
 Attr onDragStart(Msg msg) = event("dragstart", tranferId(msg));
 Attr onDragOver(Msg msg) = event("dragover", preventDefault(msg));
 Attr onDrop(Msg(str) f) = event("drop", transferredData(f)); 
+Attr onDrop(Msg(DropXY) f) = event("drop", transferredDataXY(f)); 
+
 
 // smart(er) constructors (will be spliced during render)
 list[Attr] onDrag(str id_, Msg(str) m)
@@ -275,6 +277,9 @@ list[Attr] onDrag(str id_, Msg(str) m)
 list[Attr] onDrop(Msg over, Msg(str) dropped)
     = [onDragOver(over), onDrop(dropped)];
 
+
+list[Attr] onDrop(Msg over, Msg(DropXY) dropped)
+    = [onDragOver(over), onDrop(dropped)];
 
 Attr onClick(Msg msg) = event("click", succeed(msg));
 Attr onDoubleClick(Msg msg) = event("dblclick", succeed(msg));
@@ -336,3 +341,5 @@ Hnd preventDefault(Msg msg) = handler("preventDefault", encode(msg));
 Hnd tranferId(Msg msg) = handler("transferId", encode(msg));
 
 Hnd transferredData(Msg(str) str2msg) = handler("transferredData", encode(str2msg));
+
+Hnd transferredDataXY(Msg(DropXY) str2msg) = handler("transferredDataXY", encode(str2msg));

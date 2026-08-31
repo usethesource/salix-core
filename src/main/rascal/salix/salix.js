@@ -53,7 +53,7 @@ class Salix {
 				const obs = new ResizeObserver((entries) => {
 					for (const entry of entries) {
 						var box = entry.contentBoxSize[0];
-						var data = {type: 'Resize', inline: box.inlineSize, block: box.blockSize};
+						var data = {type: 'resize', inline: box.inlineSize, block: box.blockSize};
 						this.handle({message: this.makeMessage(h, data)});
 						break; // only support one
 					}
@@ -121,6 +121,14 @@ class Salix {
 				return function (e) {
 					e.preventDefault();
 					return {type: 'string', value: e.dataTransfer.getData("text/plain")};
+				};
+			},
+
+			transferredDataXY: function (args) {
+				return function (e) {
+					e.preventDefault();
+					return {type: 'dropXY', value: e.dataTransfer.getData("text/plain"),
+							clientX: e.clientX, clientY: e.clientY};
 				};
 			},
 

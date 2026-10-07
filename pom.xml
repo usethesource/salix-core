@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.rascalmpl</groupId>
             <artifactId>rascal</artifactId>
-            <version>0.43.0-RC1</version>
+            <version>0.43.0-RC15</version>
         </dependency>
     </dependencies>
 
@@ -71,7 +71,7 @@
             <plugin>
                 <groupId>org.rascalmpl</groupId>
                 <artifactId>rascal-maven-plugin</artifactId>
-                <version>0.31.0</version>
+                <version>0.32.0-RC7</version>
                 <configuration>
                     <errorsAsWarnings>false</errorsAsWarnings>
                     <bin>${project.build.outputDirectory}</bin>
@@ -85,6 +85,13 @@
                         <phase>compile</phase>
                         <goals>
                             <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
                         </goals>
                     </execution>
                     <execution>

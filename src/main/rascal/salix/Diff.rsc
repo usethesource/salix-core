@@ -176,9 +176,11 @@ Patch diffKids(list[Node] oldKids, list[Node] newKids, Patch myPatch) {
     if (!isAlien(ok), isAlien(nk)) {
       myPatch.patches += [patch(i, edits=[edit(replace(), html=nk)])];
     }
-    // else if (isAlien(ok), isAlien(nk), getId(ok) != getId(nk)) {
-    //   myPatch.patches += [patch(i, edits=[edit(replace(), html=nk)])];
-    // }
+    // an alien taking the place of another one is a new alien too: its patch
+    // closure and internals are keyed by id, and patching would keep the old ones.
+    else if (isAlien(ok), isAlien(nk), getId(ok) != getId(nk)) {
+      myPatch.patches += [patch(i, edits=[edit(replace(), html=nk)])];
+    }
     else {
       Patch p = diff(oldKids[i], newKids[i], i);
 

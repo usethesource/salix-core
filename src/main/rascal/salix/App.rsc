@@ -133,7 +133,10 @@ The static parameter should point to the base directory from where static files 
 App[&T] webApp(SalixApp[&T] app, loc static, map[str,str] headers = ()) {
   Response respondHttp(SalixResponse r)
     = response(("commands": r.cmds, "subs": r.subs, "patch": r.patch), header = headers);
- 
+
+  // parts received so far of a message too large for one URL
+  list[str] parts = [];
+
   Response _handle(Request req) {
     if (get("/") := req) {
       SalixResponse doc = app.rr(boot());
@@ -156,8 +159,22 @@ App[&T] webApp(SalixApp[&T] app, loc static, map[str,str] headers = ()) {
     if (get("/<app.id>/init") := req) {
       return respondHttp(app.rr(begin()));
     }
-    if (get("/<app.id>/msg") := req) { 
-      map[str, value] payload = parseJSON(#map[str,value], req.parameters["payload"]);
+    if (get("/<app.id>/msg") := req) {
+      str json = req.parameters["payload"];
+      // a large message comes in parts (see sendMessage in salix.js)
+      if ("part" in req.parameters) {
+        int part = toInt(req.parameters["part"]);
+        if (part == 0) {
+          parts = [];
+        }
+        parts += [json];
+        if (part < toInt(req.parameters["of"]) - 1) {
+          return plain("part <part> received");
+        }
+        json = ("" | it + p | p <- parts);
+        parts = [];
+      }
+      map[str, value] payload = parseJSON(#map[str,value], json);
       return respondHttp(app.rr(message(payload)));
     }
      

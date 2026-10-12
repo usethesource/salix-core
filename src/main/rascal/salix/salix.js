@@ -82,6 +82,57 @@ class Salix {
 		};
 
 		this.Commands = {
+				downloadTextFile: async args => {
+					try {
+						const blob = new Blob([args.contents], {type: 'text/plain;charset=utf-8'});
+						const url = URL.createObjectURL(blob);
+						const link = document.createElement('a');
+						link.href = url;
+						link.download = args.filename;
+						document.body.appendChild(link);
+						try {
+							link.click();
+						} finally {
+							link.remove();
+							setTimeout(() => URL.revokeObjectURL(url), 0);
+						}
+					} catch (error) {
+						window.alert(`Cannot download text file: ${error.message}`);
+					}
+					return {type: 'nothing'};
+				},
+				uploadTextFile: args => new Promise(resolve => {
+					const input = document.createElement('input');
+					input.type = 'file';
+					input.style.display = 'none';
+					const finish = (contents, error = '') => {
+						input.remove();
+						resolve({type: 'values', value1: contents, value2: error});
+					};
+					input.addEventListener('cancel', () => finish(false), {once: true});
+					input.addEventListener('change', async () => {
+						const file = input.files[0];
+						if (!file) {
+							finish(false);
+							return;
+						}
+						try {
+							finish(await file.text());
+						} catch (error) {
+							finish(false, `Cannot read text file: ${error.message}`);
+						}
+					}, {once: true});
+					document.body.appendChild(input);
+					try {
+						input.click();
+					} catch (error) {
+						finish(false, `Cannot open text file: ${error.message}`);
+					}
+				}),
+				showAlert: async args => {
+					window.alert(args.message);
+					return {type: 'nothing'};
+				},
 				pickFile: args => {
 					return window.showOpenFilePicker({multiple: false}).then(fhs => {
 						const fh = fhs[0];

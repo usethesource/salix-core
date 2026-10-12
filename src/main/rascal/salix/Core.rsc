@@ -316,6 +316,15 @@ Cmd setFocus(Msg() f, str id)
 Cmd pickFile(Msg(FSHandle) f, str key)
   = command("pickFile", encode(f), args=("key": key));
 
+Cmd downloadTextFile(Msg msg, str filename, str contents)
+  = command("downloadTextFile", encode(msg), args=("filename": filename, "contents": contents));
+
+Cmd uploadTextFile(Msg(value, value) f)
+  = command("uploadTextFile", encode(f));
+
+Cmd showAlert(Msg msg, str message)
+  = command("showAlert", encode(msg), args=("message": message));
+
 /*
  * Event decoders
  */

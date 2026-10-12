@@ -395,10 +395,22 @@ class Salix {
 		if (!event.target) {
 			return false; // subscription, command
 		}
-		if (event.handler.stale) {
+		if (this.isStaleDOM(event.target)) {
 			return true;
 		}
-		return this.isStaleDOM(event.target);
+		if (event.handler.stale) {
+			// The element is still there but was re-rendered with a new handler while this
+			// event was queued (e.g. its message captures the value it shows). Ask the new
+			// handler, as if the event happened now: dropping it would lose the input.
+			var current = (event.target.salix_handlers || {})[event.type];
+			if (!current || !current.hnd) {
+			return true;
+		}
+			event.message = this.makeMessage(current.hnd.handle, this.getDecoder(current.hnd)(event));
+			event.handler = current;
+			return !event.message;
+		}
+		return false;
 	}
 	
 	isStaleDOM(dom) {
@@ -438,6 +450,7 @@ class Salix {
 				this.handle(event);
 			}
 		}
+		handler.hnd = hnd; // to re-decode a queued event with it, see isStale
 		return handler;
 	}
 	
@@ -483,6 +496,7 @@ class Salix {
 				this.handle(event);
 			}
 		}
+		handler.hnd = hnd; // to re-decode a queued event with it, see isStale
 		return handler;
 	}
 
@@ -520,6 +534,12 @@ class Salix {
 				break;
 				
 			case 'setProp': 
+				// Newer input from this element is still queued: what it shows is newer
+				// than this rendering, and the server's value comes once it caught up.
+				if ((edit.name === 'value' || edit.name === 'checked')
+				    && this.queue.some(e => e.target === dom)) {
+					break;
+				}
 				dom[edit.name] = edit.val;
 				break;
 				

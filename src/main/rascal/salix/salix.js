@@ -42,6 +42,30 @@ class Salix {
 		// TODO: this seems way too complex...
 		
 		this.Subscriptions = {
+			beforeUnload: (h, args) => {
+				window.onbeforeunload = (e) => {
+					var data = {type: 'nothing'};
+					this.handle({message: this.makeMessage(h, data)});
+					e.preventDefault();
+				};
+				return () => window.removeEventListener('beforeunload');
+			},
+
+			unload: (h, args) => {
+				window.addEventListener('unload', (e) => {
+					var data = {type: 'nothing'};
+					this.handle({message: this.makeMessage(h, data)});
+				});
+				return () => window.removeEventListener('unload');
+			},
+
+			visibilityChange: (h, args) => {
+				document.addEventListener('visibilitychange', () => {
+					var data = {type: 'string', value: document.visibilityState};
+					this.handle({message: this.makeMessage(h, data)});
+				});
+				return () => document.removeEventListener('visibilitychange');
+			},
 			timeEvery: (h, args) => {
 				var timer = setInterval(() => {
 					var data = {type: 'integer', value: (new Date().getTime() / 1000) | 0};

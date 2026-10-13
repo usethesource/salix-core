@@ -266,7 +266,16 @@ data Sub // Subscriptions
 
 @doc{Smart constructors for constructing encoded subscriptions.}
 Sub timeEvery(Msg(int) int2msg, int interval)
-  = subscription("timeEvery", encode(int2msg), args = ("interval": interval));
+  = subscription("timeEvery", encode(int2msg), args=("interval": interval));
+
+Sub visibilityChange(Msg(str) str2msg)
+  = subscription("visibilityChange", encode(str2msg));
+
+Sub beforeUnload(Msg msg)
+  = subscription("beforeUnload", encode(msg));
+
+Sub unload(Msg msg)
+  = subscription("unload", encode(msg));
 
 Sub observeFile(Msg(list[FSChange]) recs2msg, str key)
   = subscription("observeFile", encode(recs2msg), args=("key": key));

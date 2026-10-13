@@ -16,6 +16,9 @@ void savedCounterView(Model model) {
   div(id("root"), () {
     h2("Save and load a counter");
     counterView(model);
-    div(() { saveLoadButtons(); });
+    div(() {
+      loadButton(class("load-model"), "Load");
+      saveButton(class("save-model"), "Save");
+    });
   });
 }

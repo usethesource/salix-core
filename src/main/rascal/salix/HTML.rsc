@@ -158,6 +158,7 @@ Attr property(str name, value val) = prop(name, "<val>");
 Attr attribute(str name, str val) = attr(name, val);
 Attr class(str val) = attr("class", val);
 Attr classList(tuple[str, bool] classes...) = attr("class", intercalate(" ", [ k | <k, true > <- classes ]));
+Attr classes(str classList...) = attr("class", intercalate(" ", classList));
 Attr id(str val) = attr("id", val);
 Attr title(str val) = attr("title", val);
 Attr hidden(bool h) = h ? attr("hidden", "true") : null(); // ???

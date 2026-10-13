@@ -15,22 +15,29 @@ data Msg
   ;
 
 
-
+@synopsis{Create a save button}
+@examples{
+`saveButton("Save...")`
+}
 void saveButton(value vals...) = build([\type("button"), onClick(saveModel())] + vals, "button");
 
+@synopsis{Create a load button}
+@examples{
+`saveButton("Load...")`
+}
 void loadButton(value vals...) = build([\type("button"), onClick(loadModel())] + vals, "button");
 
-@doc{Add model save and load actions to an application update function.
-Pass the model type, for example `#Model`, to check loaded values.
-Save downloads a UTF-8 file in ValueIO text format.
-Load replaces the model. Invalid files leave the model unchanged and show an error.
-The model must contain values that ValueIO can serialize.
+@synopsis{Adds model save and load actions to an application update function.}
+@description{
+This wrapper gives access to the browser's own save and load file dialogs.
+Use `withSaveLoad(#Model, update)` as the `update` argument of ((makeApp)).
+Then call ((saveButton)) and ((loadButton)) inside your view at the required positions.
 
-Use `withSaveLoad(#Model, update)` as the update argument of `makeApp`.
-Call `saveButton` and `loadButton` inside your view at the required positions.
-Read a downloaded file with `readTextValueFile(#Model, file)`.
-Load a file written with `writeTextValueFile(file, model)`.
-See `salix::demo::basic::SaveLoadCounter` for a complete example.}
+loaded models (in ValueIO format). The files are saved to disk in a UTF-8 ValueIO text format.
+}
+@examples{
+* See ((salix::demo::basic::SaveLoadCounter)) for a complete example.
+}
 &T(Msg, &T) withSaveLoad(type[&T] modelType, &T(Msg, &T) update,
     str filename = "model", str extension = ".rval") {
   str suffix = extension == "" || startsWith(extension, ".") ? extension : ".<extension>";

@@ -14,10 +14,10 @@ data Msg
   ;
 
 
-void saveLoadButtons() {
-  button(\type("button"), onClick(loadModel()), "Load");
-  button(\type("button"), onClick(saveModel()), "Save");
-}
+
+void saveButton(value vals...) = build([\type("button"), onClick(saveModel())] + vals, "button");
+
+void loadButton(value vals...) = build([\type("button"), onClick(loadModel())] + vals, "button");
 
 @doc{Add model save and load actions to an application update function.
 Pass the model type, for example `#Model`, to check loaded values.
@@ -26,7 +26,7 @@ Load replaces the model. Invalid files leave the model unchanged and show an err
 The model must contain values that ValueIO can serialize.
 
 Use `withSaveLoad(#Model, update)` as the update argument of `makeApp`.
-Call `saveLoadButtons()` inside your view at the required position.
+Call `saveButton` and `loadButton` inside your view at the required positions.
 Read a downloaded file with `readTextValueFile(#Model, file)`.
 Load a file written with `writeTextValueFile(file, model)`.
 See `salix::demo::basic::SaveLoadCounter` for a complete example.}

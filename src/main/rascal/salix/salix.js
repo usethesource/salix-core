@@ -190,6 +190,35 @@ class Salix {
 		};	
 	}
 
+	// The server (NanoHTTPD) truncates request lines, URL included, at 8 KB, and
+	// the REPL content server only accepts GET. So a large message (e.g. a whole
+	// program) is sent as several GETs, with part=i&of=n; the server joins the
+	// parts (see webApp in App.rsc). Resolves to the response of the last part.
+	sendMessage(message) {
+		const max = 4000; // encoded characters per part, leaving room for headers
+		const parts = [];
+		let cur = '';
+		for (const ch of JSON.stringify(message)) {
+			const enc = encodeURIComponent(ch);
+			if (cur.length + enc.length > max) {
+				parts.push(cur);
+				cur = '';
+			}
+			cur += enc;
+		}
+		parts.push(cur);
+		const base = this.makeURL('msg');
+		if (parts.length === 1) {
+			return fetch(base + '?payload=' + parts[0]);
+		}
+		const send = i => fetch(base + '?part=' + i + '&of=' + parts.length + '&payload=' + parts[i]);
+		let chain = send(0);
+		for (let i = 1; i < parts.length; i++) {
+			chain = chain.then(response => response.ok ? send(i) : response);
+		}
+		return chain;
+	}
+
 	makeURL(msg, data) {
 	    var base = (this.host || '') + '/' + this.appId + '/' + msg;
 	    if (data) {
@@ -292,7 +321,7 @@ class Salix {
 					continue;
 				}
 				this.renderRequested = true;
-				fetch(this.makeURL('msg', event.message))
+				this.sendMessage(event.message)
 				   .then(response => {
 						if (!response.ok) {
 							return Promise.reject(response);

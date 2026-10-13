@@ -9,7 +9,7 @@ import salix::demo::basic::Counter;
 
 App[Model] saveLoadCounterWebApp() = webApp(
   makeApp("root", init, withIndex("Save and load a counter", "root", savedCounterView),
-    withSaveLoad(#Model, update, filename="counter.rval")),
+    withSaveLoad(#Model, update, filename="counter", extension=".rval")),
   |project://salix-core/src/main/rascal|);
 
 void savedCounterView(Model model) {

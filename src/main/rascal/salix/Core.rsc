@@ -319,8 +319,8 @@ Cmd pickFile(Msg(FSHandle) f, str key)
 Cmd downloadTextFile(Msg msg, str filename, str contents)
   = command("downloadTextFile", encode(msg), args=("filename": filename, "contents": contents));
 
-Cmd uploadTextFile(Msg(value, value) f)
-  = command("uploadTextFile", encode(f));
+Cmd uploadTextFile(Msg(value, value) f, str accept = "")
+  = command("uploadTextFile", encode(f), args=("accept": accept));
 
 Cmd showAlert(Msg msg, str message)
   = command("showAlert", encode(msg), args=("message": message));

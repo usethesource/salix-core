@@ -104,6 +104,7 @@ class Salix {
 				uploadTextFile: args => new Promise(resolve => {
 					const input = document.createElement('input');
 					input.type = 'file';
+					input.accept = args.accept;
 					input.style.display = 'none';
 					const finish = (contents, error = '') => {
 						input.remove();

@@ -5,6 +5,7 @@ import salix::Core;
 import salix::HTML;
 import IO;
 import ValueIO;
+import String;
 
 data Msg
   = saveModel()
@@ -30,7 +31,10 @@ Call `saveButton` and `loadButton` inside your view at the required positions.
 Read a downloaded file with `readTextValueFile(#Model, file)`.
 Load a file written with `writeTextValueFile(file, model)`.
 See `salix::demo::basic::SaveLoadCounter` for a complete example.}
-&T(Msg, &T) withSaveLoad(type[&T] modelType, &T(Msg, &T) update, str filename = "model.rval") {
+&T(Msg, &T) withSaveLoad(type[&T] modelType, &T(Msg, &T) update,
+    str filename = "model", str extension = ".rval") {
+  str suffix = extension == "" || startsWith(extension, ".") ? extension : ".<extension>";
+  str savedFilename = suffix == "" || endsWith(filename, suffix) ? filename : "<filename><suffix>";
   return &T(Msg msg, &T model) {
     switch (msg) {
       case saveModel(): {
@@ -38,13 +42,13 @@ See `salix::demo::basic::SaveLoadCounter` for a complete example.}
           str contents = iprintToString(model);
           // Check that ValueIO can read the complete model before download.
           readTextValueString(modelType, contents);
-          do(downloadTextFile(modelFileDone(), filename, contents));
+          do(downloadTextFile(modelFileDone(), savedFilename, contents));
         }
         catch value error: showError("Cannot save model: <error>");
         return model;
       }
       case loadModel(): {
-        do(uploadTextFile(modelFileRead));
+        do(uploadTextFile(modelFileRead, accept=suffix));
         return model;
       }
       case modelFileRead(value contents, value error): {

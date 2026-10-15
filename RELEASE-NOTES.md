@@ -1,3 +1,7 @@
+## 0.3.1
+
+* Updated to `rascal` 0.43.0 and `rascal-maven-plugin` 0.32.2
+
 ## 0.3.0
 
 * added support for drag and drop.

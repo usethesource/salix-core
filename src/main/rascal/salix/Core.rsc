@@ -167,7 +167,13 @@ void printNodeStack() {
 }
 
 @doc{Basic stack management functions.}
-private void add(Node h) = push(pop() + [h]);
+private void add(Node h) = push(pop() + [h]) when stack != [];
+
+private default void add(Node h) {
+  str nodeName = h.tagName == "" ? "HTML node" : "HTML element \'<h.tagName>\'";
+  throw "Cannot add <nodeName>: no active render scope. "
+      + "Call HTML functions inside a view rendered by Salix. ";
+}
 
 public void addNode(Node h) = add(h);
 

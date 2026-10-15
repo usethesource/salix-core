@@ -108,7 +108,6 @@
                             <goal>tutor</goal>
                         </goals>
                         <configuration>
-                            <enableStandardLibrary>true</enableStandardLibrary>
                             <errorsAsWarnings>false</errorsAsWarnings>
                             <bin>${project.build.outputDirectory}</bin>
                             <sources>|http://github.com/usethesource/salix-core|</sources>

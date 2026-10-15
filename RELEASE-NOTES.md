@@ -1,3 +1,19 @@
+## 0.3.0
+
+* added support for drag and drop.
+* added support for detection of resizing elements.
+* added workaround for `get` messages that go over the 8kb size limit.
+* added new subscriptions for `timeEvery`, `visibilityChange` and `unload`, useful for libvm.
+* fixes a bug in the patch code for when alien id's change.
+* added save/load feature as a set of commands that wrap the `update` function, including two view functions for save and load buttons. This feature can be used to save the entire model to an arbitrary file using the native file dialog of the browser and load it back later again.
+* allow interaction with stale elements, in order to remove input lag on rapid input change.
+
+
+## 0.2.12
+
+* added collapsible tree with
+* removed all usage of Rascal annotations
+
 ## 0.2.11
 
 * salix-core did not work properly as a library dependency anymore. This was fixed.

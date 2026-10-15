@@ -12,6 +12,11 @@ App[Model] saveLoadCounterWebApp() = webApp(
     withSaveLoad(#Model, update, filename="counter", extension="rval")),
   |project://salix-core/src/main/rascal|);
 
+App[Model] saveLoadCounterWebAppAlternative() = webApp(
+  makeApp("root", init, withIndex("Save and load a counter", "root", savedCounterView),
+    update+saveLoadUpdate(#Model, filename="counter", extension="rval")),
+  |project://salix-core/src/main/rascal|);
+
 void savedCounterView(Model model) {
   div(id("root"), () {
     h2("Save and load a counter");

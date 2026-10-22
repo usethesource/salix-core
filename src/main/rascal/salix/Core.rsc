@@ -322,6 +322,9 @@ Cmd random(Msg(int) f, int from, int to)
 Cmd setFocus(Msg() f, str id)
   = command("setFocus", encode(f), args = ("id": id));
 
+Cmd send(Msg msg)
+  = command("send", encode(msg));
+
 Cmd pickFile(Msg(FSHandle) f, str key)
   = command("pickFile", encode(f), args=("key": key));
 

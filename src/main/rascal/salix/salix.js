@@ -175,6 +175,10 @@ class Salix {
 					var id = args.id;
 					document.getElementById(id).focus();
 					return {type: 'nothing'};
+				},
+				// the handle encodes the message itself
+				send: async args => {
+					return {type: 'nothing'};
 				}
 		};
 
@@ -439,27 +443,23 @@ class Salix {
 	}
 	
 	doCommands(cmds) {
-		// var prepend = [];
-		// for (var i = 0; i < cmds.length; i++) {
-		// 	var cmd = cmds[i];
-		// 	if (cmd.none) { // legacy; let's move to list[Cmd] again...
-		// 		continue;
-		// 	}
-			//var data = this.Commands[cmd.name](cmd.args);
-
-			var cmd = cmds[0];
-			if (cmd === undefined) {
-				return Promise.resolve(1);
+		// Run the commands one after the other (they can be async, e.g. pickFile).
+		var prepend = [];
+		var done = Promise.resolve(1);
+		for (const cmd of cmds) {
+			done = done
+				.then(() => this.Commands[cmd.name](cmd.args))
+				.then(data => {
+					prepend.push({message: this.makeMessage(cmd.handle, data)});
+				});
+		}
+		return done.then(() => {
+			// unshift in reverse, so that first executed command
+			// is handled first.
+			for (var i = prepend.length - 1; i >= 0; i--) {
+				this.queue.unshift(prepend[i]);
 			}
-			return this.Commands[cmd.name](cmd.args).then(data => {
-				//prepend.push({message: this.makeMessage(cmd.handle, data)});
-				this.queue.unshift({message: this.makeMessage(cmd.handle, data)});
-			})
-		// for (var i = prepend.length - 1; i >= 0; i--) {
-		// 	// unshift in reverse, so that first executed command
-		// 	// is handled first.
-		// 	this.queue.unshift(prepend[i]);
-		// }
+		});
 	}
 	
 	subscribe(subs) {

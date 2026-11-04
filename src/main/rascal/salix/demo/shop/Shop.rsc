@@ -19,7 +19,7 @@ import util::UUID;
 // This app is based on: https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/
 
 data Article
-  = article(str name, real price, loc id, str newName = "", real newPrice = 0.0);
+  = shopArticle(str name, real price, loc id, str newName = "", real newPrice = 0.0);
   
 data Entry
   = entry(loc id, int amount);
@@ -34,9 +34,9 @@ alias Model = tuple[
 ];
 
 Model init() = <
-  [Article::article("Funny Bunnies", 17.63, bunnyId),
-   Article::article("Awesome React", 23.95, uuid()),
-   Article::article("Second hand Netbook", 50.00, uuid())],
+  [shopArticle("Funny Bunnies", 17.63, bunnyId),
+   shopArticle("Awesome React", 23.95, uuid()),
+   shopArticle("Second hand Netbook", 50.00, uuid())],
   [entry(bunnyId, 1)],
   "",
   0.0
@@ -113,7 +113,7 @@ Model update(Msg msg, Model m) {
       m.newName = name;
 
     case newArticle(): 
-      m.articles += [Article::article(m.newName, m.newPrice, uuid())];
+      m.articles += [shopArticle(m.newName, m.newPrice, uuid())];
   }
   
   return m;
